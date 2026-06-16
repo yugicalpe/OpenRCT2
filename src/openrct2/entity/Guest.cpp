@@ -242,6 +242,7 @@ namespace OpenRCT2
         "EILIDH BELL",
         "NANCY STILLWAGON",
         "DAVID ELLIS",
+        "ISABELLE",
     };
     // clang-format on
 
