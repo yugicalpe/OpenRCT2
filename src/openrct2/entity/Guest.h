@@ -178,6 +178,8 @@ namespace OpenRCT2
         excitedDeprecated = 172,  // "I'm so excited - It's an Intamin ride!"
         hereWeAre = 173,          // "...and here we are on X!"
 
+        isabellepatrol = 174,
+
         none = 255
     };
 
