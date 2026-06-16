@@ -452,7 +452,7 @@ namespace OpenRCT2
         EASTEREGG_PEEP_NAME_EILIDH_BELL,
         EASTEREGG_PEEP_NAME_NANCY_STILLWAGON,
         EASTEREGG_PEEP_NAME_DAVID_ELLIS,
-        EASTEREGG_PEEP_NAME_ISABELLE
+        EASTEREGG_PEEP_NAME_ISABELLE,
     };
 
     void PeepThoughtSetFormatArgs(const PeepThought* thought, Formatter& ft);
