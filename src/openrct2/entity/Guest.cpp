@@ -749,6 +749,13 @@ namespace OpenRCT2
         {
             PeepFlags |= PEEP_FLAGS_HERE_WE_ARE;
         }
+   
+            PeepFlags &= ~PEEP_FLAGS_YELLOW;
+        if (checkEasterEggName(EASTEREGG_PEEP_NAME_ISABELLE))
+        {
+            PeepFlags |= PEEP_FLAGS_HERE_WE_ARE;
+        }
+        
     }
 
     /**
