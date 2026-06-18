@@ -61,7 +61,7 @@ jobs:
       certificate: ${{ steps.sign.outputs.certificate }}
     steps:
       # We need to fetch entire repo to get the tags and correctly run `describe`
-      - name: Check out code
+      - name: Openrct2
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
@@ -137,7 +137,7 @@ jobs:
       run:
         shell: sh
     steps:
-      - name: Checkout
+      - name: Clang
         uses: actions/checkout@v6
       - run: git config --global --add safe.directory $PWD
       - name: Run clang-format
