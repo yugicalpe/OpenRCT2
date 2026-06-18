@@ -753,7 +753,10 @@ namespace OpenRCT2
             PeepFlags &= ~PEEP_FLAGS_YELLOW;
         if (checkEasterEggName(EASTEREGG_PEEP_NAME_ISABELLE))
         {
-            PeepFlags |= PEEP_FLAGS_HERE_WE_ARE;
+            PeepFlags |= PEEP_FLAGS_JOY;
+            PeepFlags |= PEEP_FLAGS_PIZZA;
+            PeepFlags |= PEEP_FLAGS_PAINTING;
+            PeepFlags |= PEEP_FLAGS_PHOTO;
         }
         
     }
@@ -2452,6 +2455,8 @@ namespace OpenRCT2
             AnimationFrameNum = 0;
             AnimationImageIdOffset = 0;
             UpdateCurrentAnimationType();
+
+            
         }
     }
 
@@ -2765,6 +2770,7 @@ namespace OpenRCT2
         {
             if (guest.happiness >= 160 && guest.happinessTarget >= 160)
             {
+                
                 guest.favouriteRideRating = peepRideRating;
                 guest.PeepFlags |= PEEP_FLAGS_RIDE_SHOULD_BE_MARKED_AS_FAVOURITE;
             }
