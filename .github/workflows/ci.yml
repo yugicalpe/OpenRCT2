@@ -61,7 +61,7 @@ jobs:
       certificate: ${{ steps.sign.outputs.certificate }}
     steps:
       # We need to fetch entire repo to get the tags and correctly run `describe`
-      - name: Openrct2
+      - name: OpenRCT2 Fork
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
