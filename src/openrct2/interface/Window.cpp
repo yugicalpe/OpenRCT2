@@ -10,16 +10,15 @@
 #include "Window.h"
 
 #include "../Context.h"
-#include "../Diagnostic.h"
-#include "../Editor.h"
 #include "../Game.h"
-#include "../GameState.h"
 #include "../Input.h"
 #include "../OpenRCT2.h"
 #include "../audio/Audio.h"
 #include "../config/Config.h"
+#include "../drawing/Drawing.String.h"
 #include "../drawing/Drawing.h"
-#include "../interface/Cursors.h"
+#include "../drawing/RenderTarget.h"
+#include "../entity/EntityRegistry.h"
 #include "../ride/RideAudio.h"
 #include "../ui/UiContext.h"
 #include "../ui/WindowManager.h"
@@ -27,24 +26,21 @@
 #include "../world/MapSelection.h"
 #include "Viewport.h"
 #include "Widget.h"
+#include "WidgetIndexGlobals.h"
 #include "WindowBase.h"
 
 #include <cassert>
-#include <cmath>
 #include <functional>
 #include <iterator>
-#include <list>
 
 namespace OpenRCT2
 {
-
     std::vector<std::unique_ptr<WindowBase>> gWindowList;
     WindowBase* gWindowAudioExclusive;
 
     WindowCloseModifier gLastCloseModifier = { { WindowClass::null, 0 }, CloseWindowModifier::none };
 
     uint32_t gWindowUpdateTicks;
-    Drawing::Colour gCurrentWindowColours[3];
 
     Tool gCurrentToolId;
     WidgetRef gCurrentToolWidget;
@@ -630,9 +626,9 @@ static constexpr float kWindowScrollLocations[][2] = {
         w.onPrepareDraw();
 
         // Text colouring
-        gCurrentWindowColours[0] = w.colours[0].colour;
-        gCurrentWindowColours[1] = w.colours[1].colour;
-        gCurrentWindowColours[2] = w.colours[2].colour;
+        Drawing::gCurrentWindowColours[0] = w.colours[0].colour;
+        Drawing::gCurrentWindowColours[1] = w.colours[1].colour;
+        Drawing::gCurrentWindowColours[2] = w.colours[2].colour;
 
         w.onDraw(copy);
     }

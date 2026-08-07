@@ -16,6 +16,8 @@
 #include "../object/ObjectRepository.h"
 #include "CommandLine.hpp"
 
+using namespace OpenRCT2::CommandLine;
+
 namespace OpenRCT2
 {
     // clang-format off
@@ -24,7 +26,7 @@ namespace OpenRCT2
         kOptionTableEnd
     };
 
-    static exitcode_t HandleObjectsInfo(CommandLineArgEnumerator *argEnumerator);
+    static ExitCode HandleObjectsInfo(CommandLineArgEnumerator *argEnumerator);
 
     const CommandLineCommand CommandLine::kParkInfoCommands[]{
         // Main commands
@@ -34,10 +36,10 @@ namespace OpenRCT2
     };
     // clang-format on
 
-    static exitcode_t HandleObjectsInfo(CommandLineArgEnumerator* argEnumerator)
+    static ExitCode HandleObjectsInfo(CommandLineArgEnumerator* argEnumerator)
     {
-        exitcode_t result = CommandLine::HandleCommandDefault();
-        if (result != EXITCODE_CONTINUE)
+        ExitCode result = CommandLine::HandleCommandDefault();
+        if (result != ExitCode::launch)
         {
             return result;
         }
@@ -47,7 +49,7 @@ namespace OpenRCT2
         if (!argEnumerator->TryPopString(&rawSourcePath))
         {
             Console::Error::WriteLine("Expected a source save file path.");
-            return EXITCODE_FAIL;
+            return ExitCode::fail;
         }
 
         auto sourcePath = Path::GetAbsolute(rawSourcePath);
@@ -60,13 +62,13 @@ namespace OpenRCT2
         if (!TryClassifyFile(&stream, &info))
         {
             Console::Error::WriteLine("Unable to detect file type");
-            return EXITCODE_FAIL;
+            return ExitCode::fail;
         }
 
         if (info.Type != FileType::park && info.Type != FileType::savedGame && info.Type != FileType::scenario)
         {
             Console::Error::WriteLine("Invalid file type.");
-            return EXITCODE_FAIL;
+            return ExitCode::fail;
         }
 
         auto& objectRepository = context->GetObjectRepository();
@@ -124,7 +126,7 @@ namespace OpenRCT2
             Console::WriteLine("ObjectType: %s, Number of Objects: %d", typeToName[EnumValue(objType)], list.size());
             for (auto& obj : list)
             {
-                if (obj.Generation == ObjectGeneration::JSON && obj.Identifier.empty())
+                if (obj.Generation == ObjectGeneration::json && obj.Identifier.empty())
                 {
                     // Empty object slot don't output anything
                     continue;
@@ -133,7 +135,7 @@ namespace OpenRCT2
                 Console::WriteFormat("%s Object: ", sourceGameToName[EnumValue(ori->GetFirstSourceGame())]);
 
                 std::string name{ obj.GetName() };
-                if (obj.Generation == ObjectGeneration::DAT)
+                if (obj.Generation == ObjectGeneration::dat)
                 {
                     Console::WriteLine("%08X|%s|%08X", obj.Entry.flags, name.c_str(), obj.Entry.checksum);
                 }
@@ -144,6 +146,6 @@ namespace OpenRCT2
             }
             Console::WriteLine();
         }
-        return EXITCODE_OK;
+        return ExitCode::ok;
     }
 } // namespace OpenRCT2

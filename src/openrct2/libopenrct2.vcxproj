@@ -181,6 +181,7 @@
     <ClInclude Include="command_line\sprite\SpriteCommands.h" />
     <ClInclude Include="command_line\sprite\SpriteFile.h" />
     <ClInclude Include="command_line\CommandLine.hpp" />
+    <ClInclude Include="command_line\ExitCode.h" />
     <ClInclude Include="config\Config.h" />
     <ClInclude Include="config\ConfigEnum.hpp" />
     <ClInclude Include="config\ConfigTypes.h" />
@@ -273,8 +274,6 @@
     <ClInclude Include="drawing\TTF.h" />
     <ClInclude Include="drawing\WeatherDrawer.h" />
     <ClInclude Include="drawing\X8DrawingEngine.h" />
-    <ClInclude Include="Editor.h" />
-    <ClInclude Include="EditorObjectSelectionSession.h" />
     <ClInclude Include="entity\Balloon.h" />
     <ClInclude Include="entity\Duck.h" />
     <ClInclude Include="entity\EntityBase.h" />
@@ -306,9 +305,11 @@
     <ClInclude Include="interface\ScrollArea.h" />
     <ClInclude Include="interface\Viewport.h" />
     <ClInclude Include="interface\Widget.h" />
+    <ClInclude Include="interface\WidgetIndexGlobals.h" />
     <ClInclude Include="interface\Window.h" />
     <ClInclude Include="interface\WindowBase.h" />
     <ClInclude Include="interface\WindowClasses.h" />
+    <ClInclude Include="interface\WindowFlags.h" />
     <ClInclude Include="interface\ZoomLevel.h" />
     <ClInclude Include="Limits.h" />
     <ClInclude Include="localisation\Currency.h" />
@@ -601,6 +602,7 @@
     <ClInclude Include="ride\Vehicle.h" />
     <ClInclude Include="ride\VehicleColour.h" />
     <ClInclude Include="ride\VehicleData.h" />
+    <ClInclude Include="ride\VehicleFlags.h" />
     <ClInclude Include="ride\VehicleGeometry.h" />
     <ClInclude Include="ride\VehicleRiderControl.h" />
     <ClInclude Include="ride\VehicleSubpositionData.h" />
@@ -616,7 +618,11 @@
     <ClInclude Include="scenario\ScenarioSources.h" />
     <ClInclude Include="scenes\Scene.h" />
     <ClInclude Include="scenes\SceneManager.h" />
+    <ClInclude Include="scenes\editor\EditorController.h" />
+    <ClInclude Include="scenes\editor\EditorScene.h" />
     <ClInclude Include="scenes\editor\EditorStep.h" />
+    <ClInclude Include="scenes\editor\TrackDesignerScene.h" />
+    <ClInclude Include="scenes\editor\TrackManagerScene.h" />
     <ClInclude Include="scenes\game\GameScene.h" />
     <ClInclude Include="scenes\intro\IntroScene.h" />
     <ClInclude Include="scenes\preloader\PreloaderScene.h" />
@@ -907,8 +913,6 @@
     <ClCompile Include="drawing\TTFSDLPort.cpp" />
     <ClCompile Include="drawing\WeatherDrawer.cpp" />
     <ClCompile Include="drawing\X8DrawingEngine.cpp" />
-    <ClCompile Include="Editor.cpp" />
-    <ClCompile Include="EditorObjectSelectionSession.cpp" />
     <ClCompile Include="entity\Balloon.cpp" />
     <ClCompile Include="entity\Duck.cpp" />
     <ClCompile Include="entity\EntityBase.cpp" />
@@ -1208,6 +1212,10 @@
     <ClCompile Include="scenario\ScenarioSources.cpp" />
     <ClCompile Include="scenes\Scene.cpp" />
     <ClCompile Include="scenes\SceneManager.cpp" />
+    <ClCompile Include="scenes\editor\EditorController.cpp" />
+    <ClCompile Include="scenes\editor\EditorScene.cpp" />
+    <ClCompile Include="scenes\editor\TrackDesignerScene.cpp" />
+    <ClCompile Include="scenes\editor\TrackManagerScene.cpp" />
     <ClCompile Include="scenes\game\GameScene.cpp" />
     <ClCompile Include="scenes\intro\IntroScene.cpp" />
     <ClCompile Include="scenes\preloader\PreloaderScene.cpp" />

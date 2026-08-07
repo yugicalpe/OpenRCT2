@@ -11,9 +11,9 @@
 
 #include "../Context.h"
 #include "../config/Config.h"
-#include "../core/Guard.hpp"
 #include "../core/Money.hpp"
 #include "../core/Numerics.hpp"
+#include "../drawing/Drawing.Sprite.h"
 #include "../drawing/Drawing.String.h"
 #include "../drawing/Drawing.h"
 #include "../drawing/Font.h"
@@ -21,7 +21,6 @@
 #include "../localisation/Currency.h"
 #include "../localisation/Formatting.h"
 #include "../localisation/LocalisationService.h"
-#include "../localisation/StringIdType.h"
 #include "../paint/Painter.h"
 #include "../profiling/Profiling.h"
 #include "Boundbox.h"
@@ -30,7 +29,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cassert>
 
 using namespace OpenRCT2;
 using namespace OpenRCT2::Drawing;

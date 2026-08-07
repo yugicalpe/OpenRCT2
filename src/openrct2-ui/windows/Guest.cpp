@@ -32,6 +32,7 @@
 #include <openrct2/drawing/Text.h>
 #include <openrct2/entity/Guest.h>
 #include <openrct2/entity/Staff.h>
+#include <openrct2/interface/WidgetIndexGlobals.h>
 #include <openrct2/localisation/Formatter.h>
 #include <openrct2/localisation/Formatting.h>
 #include <openrct2/management/Marketing.h>
@@ -721,7 +722,8 @@ namespace OpenRCT2::Ui::Windows
             };
 
             WindowDropdownShowText(
-                { windowPos.x + widget.left, windowPos.y + widget.top }, widget.height(), colours[1], 0, dropdownItems);
+                { windowPos.x + widget.left, windowPos.y + widget.top }, widget.height(), colours[1],
+                { Dropdown::Flag::autoClose }, dropdownItems);
             gDropdown.defaultIndex = 0;
         }
 
@@ -994,6 +996,12 @@ namespace OpenRCT2::Ui::Windows
 
             gPickupPeepX = screenCoords.x - 1;
             gPickupPeepY = screenCoords.y + 16;
+
+            auto* mainWindow = WindowGetMain();
+            if (mainWindow != nullptr)
+            {
+                gPickupPeepZoom = std::min(mainWindow->viewport->zoom, ZoomLevel{ 0 });
+            }
 
             const auto peep = GetGuest();
             if (peep == nullptr)

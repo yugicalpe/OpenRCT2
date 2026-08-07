@@ -9,9 +9,8 @@
 
 #include "CableLift.h"
 
+#include "../GameState.h"
 #include "../audio/Audio.h"
-#include "../entity/EntityList.h"
-#include "../rct12/RCT12.h"
 #include "../util/Util.h"
 #include "../world/Map.h"
 #include "../world/tile_element/TileElement.h"
@@ -20,7 +19,6 @@
 #include "RideData.h"
 #include "TrackIteration.h"
 #include "Vehicle.h"
-#include "VehicleData.h"
 #include "VehicleGeometry.h"
 #include "ted/PitchAndRoll.h"
 #include "ted/TrackElemType.h"
@@ -70,7 +68,7 @@ Vehicle* CableLiftSegmentCreate(
     {
         peep = EntityId::GetNull();
     }
-    current->TrackSubposition = VehicleTrackSubposition::Default;
+    current->TrackSubposition = VehicleTrackSubposition::standard;
     current->orientation = direction << 3;
 
     z = z * kCoordsZStep;

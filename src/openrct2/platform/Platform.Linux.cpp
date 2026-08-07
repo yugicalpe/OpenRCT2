@@ -13,11 +13,8 @@
 
     #include <cstring>
     #include <fnmatch.h>
-    #include <limits.h>
     #include <locale.h>
     #include <pwd.h>
-    #include <stdlib.h>
-    #include <unistd.h>
     #include <vector>
     #if defined(__FreeBSD__) || defined(__NetBSD__)
         #include <stddef.h>
@@ -32,9 +29,9 @@
         #include <fontconfig/fontconfig.h>
     #endif // DISABLE_TTF
 
-    #include "../Date.h"
     #include "../OpenRCT2.h"
     #include "../core/Path.hpp"
+    #include "../drawing/Font.h"
     #include "../localisation/Language.h"
     #include "Platform.h"
 

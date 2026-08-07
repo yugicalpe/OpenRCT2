@@ -9,14 +9,10 @@
 
 #pragma once
 
-#include "../core/EnumUtils.hpp"
 #include "../core/Money.hpp"
 #include "Peep.h"
 
 #include <cstdint>
-#include <vector>
-
-struct Ride;
 
 namespace OpenRCT2::Drawing
 {
@@ -26,11 +22,11 @@ namespace OpenRCT2::Drawing
 namespace OpenRCT2
 {
     class DataSerialiser;
+    class PatrolArea;
 
+    struct Ride;
     struct TileElement;
     struct PathElement;
-
-    class PatrolArea;
 
     enum class StaffType : uint8_t
     {

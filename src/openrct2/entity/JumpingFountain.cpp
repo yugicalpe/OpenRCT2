@@ -9,16 +9,12 @@
 
 #include "JumpingFountain.h"
 
-#include "../Game.h"
 #include "../GameState.h"
 #include "../core/DataSerialiser.h"
 #include "../object/PathAdditionEntry.h"
-#include "../profiling/Profiling.h"
 #include "../scenario/Scenario.h"
-#include "../world/Footpath.h"
 #include "../world/Location.hpp"
 #include "../world/Map.h"
-#include "../world/Scenery.h"
 #include "../world/tile_element/PathElement.h"
 #include "EntityRegistry.h"
 
@@ -177,7 +173,7 @@ namespace OpenRCT2
 
         switch (FountainType)
         {
-            case JumpingFountainType::Water:
+            case JumpingFountainType::water:
                 if (frame == 11 && fountainFlags.has(FountainFlag::fast))
                 {
                     AdvanceAnimation();
@@ -187,7 +183,7 @@ namespace OpenRCT2
                     AdvanceAnimation();
                 }
                 break;
-            case JumpingFountainType::Snow:
+            case JumpingFountainType::snow:
                 if (frame == 16)
                 {
                     AdvanceAnimation();
@@ -256,7 +252,7 @@ namespace OpenRCT2
 
     bool JumpingFountain::IsJumpingFountain(const JumpingFountainType newType, const CoordsXYZ& newLoc)
     {
-        const int32_t pathAdditionFlagMask = newType == JumpingFountainType::Snow ? PATH_ADDITION_FLAG_JUMPING_FOUNTAIN_SNOW
+        const int32_t pathAdditionFlagMask = newType == JumpingFountainType::snow ? PATH_ADDITION_FLAG_JUMPING_FOUNTAIN_SNOW
                                                                                   : PATH_ADDITION_FLAG_JUMPING_FOUNTAIN_WATER;
 
         TileElement* tileElement = MapGetFirstElementAt(newLoc);
@@ -264,7 +260,7 @@ namespace OpenRCT2
             return false;
         do
         {
-            if (tileElement->getType() != TileElementType::Path)
+            if (tileElement->getType() != TileElementType::path)
                 continue;
             if (tileElement->getBaseZ() != newLoc.z)
                 continue;

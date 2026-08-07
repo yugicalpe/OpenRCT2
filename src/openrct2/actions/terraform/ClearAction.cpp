@@ -15,9 +15,11 @@
 #include "../../management/Finance.h"
 #include "../../world/Location.hpp"
 #include "../../world/Map.h"
+#include "../../world/TileElementsView.h"
 #include "../../world/tile_element/LargeSceneryElement.h"
 #include "../../world/tile_element/SmallSceneryElement.h"
 #include "../GameActionRunner.h"
+#include "../footpath/FootpathAdditionRemoveAction.h"
 #include "../footpath/FootpathRemoveAction.h"
 #include "../scenery/LargeSceneryRemoveAction.h"
 #include "../scenery/SmallSceneryRemoveAction.h"
@@ -138,7 +140,7 @@ namespace OpenRCT2::GameActions
 
                 switch (tileElement->getType())
                 {
-                    case TileElementType::Path:
+                    case TileElementType::path:
                         if (_itemsToClear & CLEARABLE_ITEMS::kSceneryFootpath)
                         {
                             auto footpathRemoveAction = FootpathRemoveAction({ tilePos, tileElement->getBaseZ() });
@@ -157,8 +159,25 @@ namespace OpenRCT2::GameActions
                                 totalCost += res.cost;
                             }
                         }
+                        if (!tileEdited && _itemsToClear & CLEARABLE_ITEMS::kPathAddition)
+                        {
+                            auto additionRemoveAction = FootpathAdditionRemoveAction({ tilePos, tileElement->getBaseZ() });
+                            additionRemoveAction.SetFlags(GetFlags());
+
+                            auto res = executing ? ExecuteNested(&additionRemoveAction, gameState)
+                                                 : QueryNested(&additionRemoveAction, gameState);
+
+                            if (res.error == Status::ok)
+                            {
+                                totalCost += res.cost;
+                            }
+                            else if (res.error == Status::insufficientFunds)
+                            {
+                                totalCost += res.cost;
+                            }
+                        }
                         break;
-                    case TileElementType::SmallScenery:
+                    case TileElementType::smallScenery:
                         if (_itemsToClear & CLEARABLE_ITEMS::kScenerySmall)
                         {
                             auto removeSceneryAction = SmallSceneryRemoveAction(
@@ -180,8 +199,8 @@ namespace OpenRCT2::GameActions
                             }
                         }
                         break;
-                    case TileElementType::Wall:
-                        if (_itemsToClear & CLEARABLE_ITEMS::kScenerySmall)
+                    case TileElementType::wall:
+                        if (_itemsToClear & CLEARABLE_ITEMS::kSceneryWall)
                         {
                             CoordsXYZD wallLocation = { tilePos, tileElement->getBaseZ(), tileElement->getDirection() };
                             auto wallRemoveAction = WallRemoveAction(wallLocation);
@@ -201,7 +220,7 @@ namespace OpenRCT2::GameActions
                             }
                         }
                         break;
-                    case TileElementType::LargeScenery:
+                    case TileElementType::largeScenery:
                         if (_itemsToClear & CLEARABLE_ITEMS::kSceneryLarge)
                         {
                             auto removeSceneryAction = LargeSceneryRemoveAction(
@@ -239,16 +258,10 @@ namespace OpenRCT2::GameActions
         {
             for (int32_t x = 0; x < gameState.mapSize.x; x++)
             {
-                auto tileElement = MapGetFirstElementAt(TileCoordsXY{ x, y });
-                do
+                for (auto* sceneryElement : TileElementsView<LargeSceneryElement>(TileCoordsXY{ x, y }))
                 {
-                    if (tileElement == nullptr)
-                        break;
-                    if (tileElement->getType() == TileElementType::LargeScenery)
-                    {
-                        tileElement->asLargeScenery()->SetIsAccounted(false);
-                    }
-                } while (!(tileElement++)->isLastForTile());
+                    sceneryElement->SetIsAccounted(false);
+                }
             }
         }
     }

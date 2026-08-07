@@ -40,6 +40,8 @@
 #include <openrct2/core/String.hpp>
 #include <openrct2/drawing/Drawing.h>
 #include <openrct2/drawing/IDrawingEngine.h>
+#include <openrct2/drawing/NewDrawing.h>
+#include <openrct2/drawing/RenderTarget.h>
 #include <openrct2/interface/Chat.h>
 #include <openrct2/platform/Platform.h>
 #include <openrct2/scenes/title/TitleSequencePlayer.h>
@@ -808,7 +810,7 @@ private:
 
         // Create window in window first rather than fullscreen so we have the display the window is on first
         uint32_t flags = SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI;
-        if (Config::Get().general.drawingEngine == DrawingEngine::OpenGL)
+        if (Config::Get().general.drawingEngine == DrawingEngine::openGL)
         {
             flags |= SDL_WINDOW_OPENGL;
         }

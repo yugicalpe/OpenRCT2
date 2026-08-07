@@ -11,7 +11,7 @@
 #include <openrct2-ui/ride/Construction.h>
 #include <openrct2-ui/windows/Windows.h>
 #include <openrct2/Context.h>
-#include <openrct2/Editor.h>
+#include <openrct2/GameState.h>
 #include <openrct2/OpenRCT2.h>
 #include <openrct2/SpriteIds.h>
 #include <openrct2/audio/Audio.h>
@@ -19,16 +19,21 @@
 #include <openrct2/core/String.hpp>
 #include <openrct2/core/UnitConversion.h>
 #include <openrct2/drawing/ColourMap.h>
+#include <openrct2/drawing/Drawing.Sprite.h>
 #include <openrct2/drawing/Drawing.String.h>
 #include <openrct2/drawing/Drawing.h>
 #include <openrct2/drawing/IDrawingEngine.h>
+#include <openrct2/drawing/NewDrawing.h>
 #include <openrct2/drawing/Rectangle.h>
 #include <openrct2/drawing/Text.h>
+#include <openrct2/interface/WidgetIndexGlobals.h>
 #include <openrct2/localisation/Formatting.h>
 #include <openrct2/ride/RideConstruction.h>
 #include <openrct2/ride/RideData.h>
 #include <openrct2/ride/TrackDesign.h>
 #include <openrct2/ride/TrackDesignRepository.h>
+#include <openrct2/scenes/SceneManager.h>
+#include <openrct2/scenes/editor/EditorScene.h>
 #include <openrct2/ui/WindowManager.h>
 #include <openrct2/windows/Intent.h>
 #include <vector>
@@ -144,7 +149,7 @@ namespace OpenRCT2::Ui::Windows
                 return;
             }
 
-            if (_loadedTrackDesign->gameStateData.hasFlag(TrackDesignGameStateFlag::SceneryUnavailable))
+            if (_loadedTrackDesign->gameStateData.hasFlag(TrackDesignGameStateFlag::sceneryUnavailable))
             {
                 gTrackDesignSceneryToggle = true;
             }
@@ -160,7 +165,7 @@ namespace OpenRCT2::Ui::Windows
             else
             {
                 if (_loadedTrackDesignIndex != kTrackDesignIndexUnloaded
-                    && (_loadedTrackDesign->gameStateData.hasFlag(TrackDesignGameStateFlag::VehicleUnavailable)))
+                    && (_loadedTrackDesign->gameStateData.hasFlag(TrackDesignGameStateFlag::vehicleUnavailable)))
                 {
                     ContextShowError(STR_THIS_DESIGN_WILL_BE_BUILT_WITH_AN_ALTERNATIVE_VEHICLE_TYPE, kStringIdNone, {});
                 }
@@ -252,7 +257,9 @@ namespace OpenRCT2::Ui::Windows
             auto* windowMgr = GetWindowManager();
             windowMgr->CloseByNumber(WindowClass::manageTrackDesign, number);
             windowMgr->CloseByNumber(WindowClass::trackDeletePrompt, number);
-            Editor::LoadTrackManager();
+
+            auto& gameState = getGameState();
+            gameState.editorStep = Editor::Step::objectSelection;
         }
 
         void onClose() override
@@ -410,17 +417,11 @@ namespace OpenRCT2::Ui::Windows
             const bool showPreview = (gLegacyScene == LegacyScene::trackDesignsManager) || selectedListItem != 0;
             setWidgetPressed(WIDX_TRACK_PREVIEW, showPreview);
             setWidgetDisabled(WIDX_TRACK_PREVIEW, !showPreview);
+
+            widgets[WIDX_ROTATE].setVisible(showPreview);
+            widgets[WIDX_TOGGLE_SCENERY].setVisible(showPreview);
             if (showPreview)
-            {
-                widgets[WIDX_ROTATE].type = WidgetType::flatBtn;
-                widgets[WIDX_TOGGLE_SCENERY].type = WidgetType::flatBtn;
                 setWidgetPressed(WIDX_TOGGLE_SCENERY, !gTrackDesignSceneryToggle);
-            }
-            else
-            {
-                widgets[WIDX_ROTATE].type = WidgetType::empty;
-                widgets[WIDX_TOGGLE_SCENERY].type = WidgetType::empty;
-            }
 
             // When debugging tools are on, shift everything up a bit to make room for displaying the path.
             const int32_t bottomMargin = Config::Get().general.debuggingTools ? (kWindowPadding + kDebugPathHeight)
@@ -515,7 +516,7 @@ namespace OpenRCT2::Ui::Windows
             screenPos.y = windowPos.y + tdWidget.bottom - 12;
 
             // Warnings
-            if (_loadedTrackDesign->gameStateData.hasFlag(TrackDesignGameStateFlag::VehicleUnavailable)
+            if (_loadedTrackDesign->gameStateData.hasFlag(TrackDesignGameStateFlag::vehicleUnavailable)
                 && gLegacyScene != LegacyScene::trackDesignsManager)
             {
                 // Vehicle design not available
@@ -523,7 +524,7 @@ namespace OpenRCT2::Ui::Windows
                 screenPos.y -= kScrollableRowHeight;
             }
 
-            if (_loadedTrackDesign->gameStateData.hasFlag(TrackDesignGameStateFlag::SceneryUnavailable))
+            if (_loadedTrackDesign->gameStateData.hasFlag(TrackDesignGameStateFlag::sceneryUnavailable))
             {
                 if (!gTrackDesignSceneryToggle)
                 {

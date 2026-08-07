@@ -12,7 +12,6 @@
 #include "EntityBase.h"
 
 struct CoordsXY;
-struct PaintSession;
 
 namespace OpenRCT2
 {
@@ -23,11 +22,11 @@ namespace OpenRCT2
         static constexpr auto cEntityType = EntityType::duck;
         enum class DuckState : uint8_t
         {
-            FlyToWater,
-            Swim,
-            Drink,
-            DoubleDrink,
-            FlyAway,
+            flyToWater,
+            swim,
+            drink,
+            doubleDrink,
+            flyAway,
         };
         uint16_t frame;
         int16_t target_x;

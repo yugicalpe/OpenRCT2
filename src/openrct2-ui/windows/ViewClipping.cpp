@@ -45,8 +45,8 @@ namespace OpenRCT2::Ui::Windows
 
     enum class DisplayType
     {
-        DisplayRaw,
-        DisplayUnits
+        displayRaw,
+        displayUnits
     };
 
 #pragma region Widgets
@@ -108,13 +108,13 @@ namespace OpenRCT2::Ui::Windows
                 }
                 case WIDX_CLIP_HEIGHT_VALUE:
                     // Toggle display of the cut height value in RAW vs UNITS
-                    if (_clipHeightDisplayType == DisplayType::DisplayRaw)
+                    if (_clipHeightDisplayType == DisplayType::displayRaw)
                     {
-                        _clipHeightDisplayType = DisplayType::DisplayUnits;
+                        _clipHeightDisplayType = DisplayType::displayUnits;
                     }
                     else
                     {
-                        _clipHeightDisplayType = DisplayType::DisplayRaw;
+                        _clipHeightDisplayType = DisplayType::displayRaw;
                     }
                     this->invalidate();
                     break;
@@ -295,7 +295,7 @@ namespace OpenRCT2::Ui::Windows
 
             switch (_clipHeightDisplayType)
             {
-                case DisplayType::DisplayRaw:
+                case DisplayType::displayRaw:
                 default:
                 {
                     auto ft = Formatter();
@@ -305,14 +305,16 @@ namespace OpenRCT2::Ui::Windows
                     drawText(rt, screenCoords, STR_FORMAT_INTEGER, ft, { this->colours[0] });
                     break;
                 }
-                case DisplayType::DisplayUnits:
+                case DisplayType::displayUnits:
                 {
                     // Print the value in the configured height label type:
                     if (Config::Get().general.showHeightAsUnits)
                     {
                         // Height label is Units.
+                        auto fpHeight = MakeFixed1dp<fixed16_1dp>(gClipHeight, 0) / 2 - MakeFixed1dp<fixed16_1dp>(7, 0);
+
                         auto ft = Formatter();
-                        ft.Add<fixed16_1dp>((MakeFixed1dp<fixed16_1dp>(gClipHeight, 0) / 2 - MakeFixed1dp<fixed16_1dp>(7, 0)));
+                        ft.Add<fixed16_1dp>(fpHeight);
                         drawText(
                             rt, screenCoords, STR_UNIT1DP_NO_SUFFIX, ft,
                             { this->colours[0] }); // Printing the value in Height Units.
@@ -326,17 +328,21 @@ namespace OpenRCT2::Ui::Windows
                             case MeasurementFormat::metric:
                             case MeasurementFormat::SI:
                             {
+                                auto fpHeight = std::llround(MakeFixed2dp<fixed32_2dp>(gClipHeight, 0) / 2 * 1.5f)
+                                    - MakeFixed2dp<fixed32_2dp>(10, 50);
+
                                 auto ft = Formatter();
-                                ft.Add<fixed32_2dp>(
-                                    MakeFixed2dp<fixed32_2dp>(gClipHeight, 0) / 2 * 1.5f - MakeFixed2dp<fixed32_2dp>(10, 50));
+                                ft.Add<fixed32_2dp>(fpHeight);
                                 drawText(rt, screenCoords, STR_UNIT2DP_SUFFIX_METRES, ft, { this->colours[0] });
                                 break;
                             }
                             case MeasurementFormat::imperial:
                             {
+                                auto fpHeight = std::llround(MakeFixed1dp<fixed16_1dp>(gClipHeight, 0) / 2 * 5.0f)
+                                    - MakeFixed1dp<fixed16_1dp>(35, 0);
+
                                 auto ft = Formatter();
-                                ft.Add<fixed16_1dp>(
-                                    MakeFixed1dp<fixed16_1dp>(gClipHeight, 0) / 2.0f * 5 - MakeFixed1dp<fixed16_1dp>(35, 0));
+                                ft.Add<fixed16_1dp>(fpHeight);
                                 drawText(rt, screenCoords, STR_UNIT1DP_SUFFIX_FEET, ft, { this->colours[0] });
                                 break;
                             }
@@ -357,7 +363,7 @@ namespace OpenRCT2::Ui::Windows
 
             WindowInitScrollWidgets(*this);
 
-            _clipHeightDisplayType = DisplayType::DisplayUnits;
+            _clipHeightDisplayType = DisplayType::displayUnits;
 
             // Initialise the clip height slider from the current clip height value.
             this->SetClipHeight(gClipHeight);

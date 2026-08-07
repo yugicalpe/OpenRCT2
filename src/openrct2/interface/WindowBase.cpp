@@ -2,8 +2,6 @@
 
 #include "../config/Config.h"
 #include "../drawing/Drawing.h"
-#include "../entity/EntityList.h"
-#include "../entity/EntityRegistry.h"
 #include "Cursors.h"
 #include "Viewport.h"
 
@@ -47,7 +45,7 @@ namespace OpenRCT2
 
     CursorID WindowBase::onCursor(WidgetIndex, const ScreenCoordsXY&, CursorID)
     {
-        return CursorID::Arrow;
+        return CursorID::arrow;
     }
 
     static inline void repositionCloseButton(Widget& closeButton, int32_t windowWidth, bool translucent)

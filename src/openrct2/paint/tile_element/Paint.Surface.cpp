@@ -17,7 +17,6 @@
 #include "../../core/Numerics.hpp"
 #include "../../entity/EntityRegistry.h"
 #include "../../entity/PatrolArea.h"
-#include "../../entity/Peep.h"
 #include "../../entity/Staff.h"
 #include "../../interface/Viewport.h"
 #include "../../object/TerrainEdgeObject.h"
@@ -50,30 +49,30 @@ static constexpr uint8_t Byte97B444[] = {
 };
 
 // rct2: 0x97B464, 0x97B474, 0x97B484, 0x97B494
-static constexpr CoordsXY viewport_surface_paint_data[][4] = {
+static constexpr CoordsXY kNeighbouringTileCoordOffsets[4][kNumOrthogonalDirections] = {
     {
         { 32, 0 },
-        { -32, 32 },
-        { -64, -32 },
-        { 0, -64 },
+        { 0, 32 },
+        { -32, 0 },
+        { 0, -32 },
     },
     {
         { 0, 32 },
-        { -64, 0 },
-        { -32, -64 },
-        { 32, -32 },
+        { -32, 0 },
+        { 0, -32 },
+        { 32, 0 },
     },
     {
         { 0, -32 },
-        { 0, 0 },
+        { 32, 0 },
+        { 0, 32 },
         { -32, 0 },
-        { -32, -32 },
     },
     {
         { -32, 0 },
-        { -32, -32 },
         { 0, -32 },
-        { 0, 0 },
+        { 32, 0 },
+        { 0, 32 },
     },
 };
 
@@ -113,22 +112,22 @@ struct TunnelDescriptor
     uint8_t imageOffset;
 };
 static constexpr TunnelDescriptor kTunnels[] = {
-    { 2, 2, 0,   15, TunnelType::StandardFlat,                    36 }, // TunnelType::StandardFlat
-    { 3, 3, 0,   15, TunnelType::StandardFlat,                    40 }, // TunnelType::StandardSlopeStart
-    { 3, 5, -32,  4, TunnelType::StandardFlat,                    44 }, // TunnelType::StandardSlopeEnd
-    { 3, 3, 0,   15, TunnelType::InvertedFlat,                    48 }, // TunnelType::InvertedFlat
-    { 4, 4, 0,   15, TunnelType::InvertedFlat,                    52 }, // TunnelType::InvertedSlopeStart
-    { 4, 7, -48,  4, TunnelType::InvertedFlat,                    56 }, // TunnelType::InvertedSlopeEnd
-    { 2, 2, 0,   15, TunnelType::SquareFlat,                      60 }, // TunnelType::SquareFlat
-    { 3, 3, 0,   15, TunnelType::SquareFlat,                      64 }, // TunnelType::SquareSlopeStart
-    { 3, 5, -32,  4, TunnelType::SquareFlat,                      68 }, // TunnelType::SquareSlopeEnd
-    { 3, 3, 0,   15, TunnelType::SquareFlat,                      72 }, // TunnelType::InvertedSquare
-    { 2, 3, -16, 15, TunnelType::PathAndMiniGolf,                 76 }, // TunnelType::PathAndMiniGolf
-    { 2, 3, -16, 15, TunnelType::Path11,                          80 }, // TunnelType::Path11
-    { 2, 3, -16,  4, TunnelType::StandardFlatTo25Deg,             36 }, // TunnelType::StandardFlatTo25Deg
-    { 3, 4, -16,  4, TunnelType::InvertedFlatTo25Deg,             48 }, // TunnelType::InvertedFlatTo25Deg
-    { 2, 3, -16,  4, TunnelType::SquareFlatTo25Deg,               60 }, // TunnelType::SquareFlatTo25Deg
-    { 3, 4, -16,  4, TunnelType::SquareFlatTo25Deg,               72 }, // TunnelType::InvertedSquareFlatTo25Deg
+    { 2, 2, 0,   15, TunnelType::standardFlat,                    36 }, // TunnelType::StandardFlat
+    { 3, 3, 0,   15, TunnelType::standardFlat,                    40 }, // TunnelType::StandardSlopeStart
+    { 3, 5, -32,  4, TunnelType::standardFlat,                    44 }, // TunnelType::StandardSlopeEnd
+    { 3, 3, 0,   15, TunnelType::invertedFlat,                    48 }, // TunnelType::InvertedFlat
+    { 4, 4, 0,   15, TunnelType::invertedFlat,                    52 }, // TunnelType::InvertedSlopeStart
+    { 4, 7, -48,  4, TunnelType::invertedFlat,                    56 }, // TunnelType::InvertedSlopeEnd
+    { 2, 2, 0,   15, TunnelType::squareFlat,                      60 }, // TunnelType::SquareFlat
+    { 3, 3, 0,   15, TunnelType::squareFlat,                      64 }, // TunnelType::SquareSlopeStart
+    { 3, 5, -32,  4, TunnelType::squareFlat,                      68 }, // TunnelType::SquareSlopeEnd
+    { 3, 3, 0,   15, TunnelType::squareFlat,                      72 }, // TunnelType::InvertedSquare
+    { 2, 3, -16, 15, TunnelType::pathAndMiniGolf,                 76 }, // TunnelType::PathAndMiniGolf
+    { 2, 3, -16, 15, TunnelType::path11,                          80 }, // TunnelType::Path11
+    { 2, 3, -16,  4, TunnelType::standardFlatTo25Deg,             36 }, // TunnelType::StandardFlatTo25Deg
+    { 3, 4, -16,  4, TunnelType::invertedFlatTo25Deg,             48 }, // TunnelType::InvertedFlatTo25Deg
+    { 2, 3, -16,  4, TunnelType::squareFlatTo25Deg,               60 }, // TunnelType::SquareFlatTo25Deg
+    { 3, 4, -16,  4, TunnelType::squareFlatTo25Deg,               72 }, // TunnelType::InvertedSquareFlatTo25Deg
     { 2, 2, 0,   15, TunnelType::doorClosed,                      84 }, // TunnelType::doorClosed
     { 2, 2, 0,   15, TunnelType::doorOpeningOutward,              88 }, // TunnelType::doorOpeningOutward
     { 2, 2, 0,   15, TunnelType::doorOpenOutward,                 92 }, // TunnelType::doorOpenOutward
@@ -302,7 +301,7 @@ static ImageId GetTunnelImage(const TerrainEdgeObject* edgeObject, TunnelType ty
     }
 
     if (!hasDoors && EnumValue(type) >= kRegularTunnelTypeCount)
-        type = TunnelType::StandardFlat;
+        type = TunnelType::standardFlat;
 
     ImageId result = GetEdgeImageWithOffset(edgeObject, kTunnels[EnumValue(type)].imageOffset)
                          .WithIndexOffset(edge == EDGE_BOTTOMRIGHT ? 2 : 0);
@@ -937,7 +936,7 @@ void PaintSurface(PaintSession& session, uint8_t direction, uint16_t height, con
     const auto zoomLevel = session.rt.zoom_level;
     const uint8_t rotation = session.CurrentRotation;
     const uint8_t surfaceShape = ViewportSurfacePaintSetupGetRelativeSlope(tileElement, rotation);
-    const CoordsXY& base = session.SpritePosition;
+    const CoordsXY& base = session.MapPosition;
     const auto cornerHeights = GetSlopeRelativeCornerHeights(surfaceShape);
     const TileElement* elementPtr = &reinterpret_cast<const TileElement&>(tileElement);
 
@@ -959,9 +958,9 @@ void PaintSurface(PaintSession& session, uint8_t direction, uint16_t height, con
 
     TileDescriptor tileDescriptors[4];
 
-    for (std::size_t i = 0; i < std::size(viewport_surface_paint_data); i++)
+    for (std::size_t i = 0; i < std::size(kNeighbouringTileCoordOffsets); i++)
     {
-        const CoordsXY& offset = viewport_surface_paint_data[i][rotation];
+        const CoordsXY& offset = kNeighbouringTileCoordOffsets[i][rotation];
         const CoordsXY position = base + offset;
 
         TileDescriptor& descriptor = tileDescriptors[i];

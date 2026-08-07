@@ -11,10 +11,9 @@
 #include "../entity/Guest.h"
 #include "../entity/Staff.h"
 #include "../interface/Viewport.h"
-#include "../interface/Window.h"
+#include "../interface/WindowTypes.h"
 #include "../ride/Vehicle.h"
 #include "EntityList.h"
-#include "EntityRegistry.h"
 
 #include <algorithm>
 #include <cmath>

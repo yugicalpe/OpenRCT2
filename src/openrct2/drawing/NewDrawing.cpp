@@ -12,13 +12,12 @@
 #include "../Context.h"
 #include "../drawing/Drawing.h"
 #include "../interface/Screenshot.h"
-#include "../localisation/StringIds.h"
-#include "../paint/Painter.h"
 #include "../platform/Platform.h"
 #include "../ui/UiContext.h"
 #include "../world/Location.hpp"
 #include "IDrawingContext.h"
 #include "IDrawingEngine.h"
+#include "RenderTarget.h"
 
 #include <cassert>
 #include <cmath>
@@ -47,7 +46,7 @@ static IDrawingEngine* GetDrawingEngine()
 
 bool DrawingEngineRequiresNewWindow(DrawingEngine srcEngine, DrawingEngine dstEngine)
 {
-    bool openGL = srcEngine == DrawingEngine::OpenGL || dstEngine == DrawingEngine::OpenGL;
+    bool openGL = srcEngine == DrawingEngine::openGL || dstEngine == DrawingEngine::openGL;
     return Platform::RequireNewWindow(openGL);
 }
 

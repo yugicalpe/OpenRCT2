@@ -9,21 +9,17 @@
 
 #include "LightFX.h"
 
-#include "../Diagnostic.h"
 #include "../Game.h"
 #include "../GameState.h"
 #include "../config/Config.h"
 #include "../entity/EntityRegistry.h"
 #include "../interface/Viewport.h"
-#include "../interface/Window.h"
-#include "../interface/WindowBase.h"
 #include "../paint/Paint.h"
 #include "../ride/Ride.h"
 #include "../ride/RideData.h"
 #include "../ride/Vehicle.h"
 #include "../util/Util.h"
 #include "../world/tile_element/TileElement.h"
-#include "Drawing.h"
 
 #include <cmath>
 #include <cstring>
@@ -49,8 +45,8 @@ namespace OpenRCT2::Drawing::LightFx
 
     enum class Qualifier : uint8_t
     {
-        Entity,
-        Map,
+        entity,
+        map,
     };
 
     struct LightListEntry
@@ -289,7 +285,7 @@ namespace OpenRCT2::Drawing::LightFx
                 int32_t totalSamplePoints = 5;
                 int32_t startSamplePoint = 1;
 
-                if (entry.qualifier == Qualifier::Map)
+                if (entry.qualifier == Qualifier::map)
                 {
                     startSamplePoint = 0;
                     totalSamplePoints = 1;
@@ -678,12 +674,12 @@ namespace OpenRCT2::Drawing::LightFx
 
     static void Add3DLight(const CoordsXYZ& loc, const LightType lightType)
     {
-        Add3DLight(((loc.x << 16) | loc.y), Qualifier::Map, loc.z, loc, lightType);
+        Add3DLight(((loc.x << 16) | loc.y), Qualifier::map, loc.z, loc, lightType);
     }
 
     void Add3DLight(const EntityBase& entity, const uint8_t id, const CoordsXYZ& loc, const LightType lightType)
     {
-        Add3DLight(entity.id.ToUnderlying(), Qualifier::Entity, id, loc, lightType);
+        Add3DLight(entity.id.ToUnderlying(), Qualifier::entity, id, loc, lightType);
     }
 
     void Add3DLightMagicFromDrawingTile(

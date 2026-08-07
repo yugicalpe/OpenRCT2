@@ -504,29 +504,29 @@ public:
             }
 
             case INTENT_ACTION_UPDATE_CLIMATE:
-                gToolbarDirtyFlags |= BTM_TB_DIRTY_FLAG_CLIMATE;
+                gToolbarDirtyFlags.set(BottomToolbarDirtyFlag::weather);
                 InvalidateByClass(WindowClass::guestList);
                 break;
 
             case INTENT_ACTION_UPDATE_GUEST_COUNT:
-                gToolbarDirtyFlags |= BTM_TB_DIRTY_FLAG_PEEP_COUNT;
+                gToolbarDirtyFlags.set(BottomToolbarDirtyFlag::guestCount);
                 InvalidateByClass(WindowClass::guestList);
                 InvalidateByClass(WindowClass::parkInformation);
                 WindowGuestListRefreshList();
                 break;
 
             case INTENT_ACTION_UPDATE_PARK_RATING:
-                gToolbarDirtyFlags |= BTM_TB_DIRTY_FLAG_PARK_RATING;
+                gToolbarDirtyFlags.set(BottomToolbarDirtyFlag::parkRating);
                 InvalidateByClass(WindowClass::parkInformation);
                 break;
 
             case INTENT_ACTION_UPDATE_DATE:
-                gToolbarDirtyFlags |= BTM_TB_DIRTY_FLAG_DATE;
+                gToolbarDirtyFlags.set(BottomToolbarDirtyFlag::date);
                 break;
 
             case INTENT_ACTION_UPDATE_CASH:
                 InvalidateByClass(WindowClass::finances);
-                gToolbarDirtyFlags |= BTM_TB_DIRTY_FLAG_MONEY;
+                gToolbarDirtyFlags.set(BottomToolbarDirtyFlag::money);
                 break;
 
             case INTENT_ACTION_UPDATE_BANNER:
@@ -576,6 +576,9 @@ public:
                 break;
             case INTENT_ACTION_REMOVE_PROVISIONAL_TRACK_PIECE:
                 RideRemoveProvisionalTrackPiece();
+                break;
+            case INTENT_ACTION_REFRESH_PLAYER_LIST:
+                MultiplayerRefreshList();
                 break;
             default:
                 break;
@@ -1206,13 +1209,14 @@ public:
         {
             const auto& widget = w.widgets[i];
 
-            if (widget.type != WidgetType::empty && widget.isVisible())
+            // Group boxes may overlay previous widgets when shared. Given their appearance, we consider them empty overlays.
+            if (widget.type == WidgetType::empty || widget.type == WidgetType::groupbox || !widget.isVisible())
+                continue;
+
+            if (screenCoords.x >= w.windowPos.x + widget.left && screenCoords.x <= w.windowPos.x + widget.right
+                && screenCoords.y >= w.windowPos.y + widget.top && screenCoords.y <= w.windowPos.y + widget.bottom)
             {
-                if (screenCoords.x >= w.windowPos.x + widget.left && screenCoords.x <= w.windowPos.x + widget.right
-                    && screenCoords.y >= w.windowPos.y + widget.top && screenCoords.y <= w.windowPos.y + widget.bottom)
-                {
-                    widget_index = i;
-                }
+                widget_index = i;
             }
         }
 

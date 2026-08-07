@@ -24,6 +24,7 @@ namespace OpenRCT2::Scripting
             JS_CGETSET_DEF("length", ScRideStation::length_get, ScRideStation::length_set),
             JS_CGETSET_DEF("entrance", ScRideStation::entrance_get, ScRideStation::entrance_set),
             JS_CGETSET_DEF("exit", ScRideStation::exit_get, ScRideStation::exit_set),
+            JS_CGETSET_DEF("queueTime", ScRideStation::queueTime_get, nullptr),
         };
         RegisterBase(ctx, "RideStation", Finalize, funcs);
     }
@@ -48,7 +49,7 @@ namespace OpenRCT2::Scripting
     RideStation* ScRideStation::GetRideStation(JSValue thisVal)
     {
         RideStationData* data = GetRideStationData(thisVal);
-        auto ride = ::GetRide(data->_rideId);
+        auto ride = OpenRCT2::GetRide(data->_rideId);
         if (ride != nullptr)
         {
             if (data->_stationIndex.ToUnderlying() < std::size(ride->getStations()))
@@ -145,6 +146,12 @@ namespace OpenRCT2::Scripting
             station->Exit = JSToCoordsXYZD(ctx, value);
         }
         return JS_UNDEFINED;
+    }
+
+    JSValue ScRideStation::queueTime_get(JSContext* ctx, JSValue thisVal)
+    {
+        auto station = GetRideStation(thisVal);
+        return JS_NewUint32(ctx, station != nullptr ? station->QueueTime : 0);
     }
 
 } // namespace OpenRCT2::Scripting

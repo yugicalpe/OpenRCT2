@@ -26,10 +26,12 @@
 #include <openrct2/actions/peep/StaffSetPatrolAreaAction.h>
 #include <openrct2/config/Config.h>
 #include <openrct2/drawing/Drawing.h>
+#include <openrct2/drawing/RenderTarget.h>
 #include <openrct2/drawing/Text.h>
 #include <openrct2/entity/EntityRegistry.h>
 #include <openrct2/entity/PatrolArea.h>
 #include <openrct2/entity/Staff.h>
+#include <openrct2/interface/WidgetIndexGlobals.h>
 #include <openrct2/localisation/Formatter.h>
 #include <openrct2/management/Finance.h>
 #include <openrct2/network/Network.h>
@@ -437,7 +439,7 @@ namespace OpenRCT2::Ui::Windows
 
                     auto ddPos = ScreenCoordsXY{ widget->left + windowPos.x, widget->top + windowPos.y };
                     int32_t extraHeight = widget->height();
-                    WindowDropdownShowText(ddPos, extraHeight, colours[1], 0, 2);
+                    WindowDropdownShowText(ddPos, extraHeight, colours[1], { Dropdown::Flag::autoClose }, 2);
                     gDropdown.defaultIndex = 0;
 
                     auto staff = GetStaff();
@@ -689,6 +691,12 @@ namespace OpenRCT2::Ui::Windows
             gPickupPeepX = screenCoords.x - 1;
             gPickupPeepY = screenCoords.y + 16;
 
+            auto* mainWindow = WindowGetMain();
+            if (mainWindow != nullptr)
+            {
+                gPickupPeepZoom = std::min(mainWindow->viewport->zoom, ZoomLevel{ 0 });
+            }
+
             auto staff = GetStaff();
             if (staff == nullptr)
             {
@@ -802,7 +810,7 @@ namespace OpenRCT2::Ui::Windows
             auto ddPos = ScreenCoordsXY{ ddWidget->left + windowPos.x, ddWidget->top + windowPos.y };
             int32_t ddHeight = ddWidget->height();
             int32_t ddWidth = ddWidget->width() - 4;
-            WindowDropdownShowTextCustomWidth(ddPos, ddHeight, colours[1], 0, Dropdown::Flag::StayOpen, numCostumes, ddWidth);
+            WindowDropdownShowTextCustomWidth(ddPos, ddHeight, colours[1], 0, {}, numCostumes, ddWidth);
 
             // Set selection
             if (checkedIndex != -1)
@@ -836,12 +844,12 @@ namespace OpenRCT2::Ui::Windows
             {
                 case StaffType::entertainer:
                 {
-                    widgets[WIDX_CHECKBOX_1].type = WidgetType::empty;
-                    widgets[WIDX_CHECKBOX_2].type = WidgetType::empty;
-                    widgets[WIDX_CHECKBOX_3].type = WidgetType::empty;
-                    widgets[WIDX_CHECKBOX_4].type = WidgetType::empty;
-                    widgets[WIDX_COSTUME_BOX].type = WidgetType::dropdownMenu;
-                    widgets[WIDX_COSTUME_BTN].type = WidgetType::button;
+                    widgets[WIDX_CHECKBOX_1].setHidden();
+                    widgets[WIDX_CHECKBOX_2].setHidden();
+                    widgets[WIDX_CHECKBOX_3].setHidden();
+                    widgets[WIDX_CHECKBOX_4].setHidden();
+                    widgets[WIDX_COSTUME_BOX].setVisible();
+                    widgets[WIDX_COSTUME_BTN].setVisible();
 
                     auto pos = std::find_if(_availableCostumes.begin(), _availableCostumes.end(), [staff](auto costume) {
                         return costume.index == staff->AnimationObjectIndex;
@@ -861,28 +869,28 @@ namespace OpenRCT2::Ui::Windows
                     break;
                 }
                 case StaffType::handyman:
-                    widgets[WIDX_CHECKBOX_1].type = WidgetType::checkbox;
+                    widgets[WIDX_CHECKBOX_1].setVisible();
                     widgets[WIDX_CHECKBOX_1].text = STR_STAFF_OPTION_SWEEP_FOOTPATHS;
-                    widgets[WIDX_CHECKBOX_2].type = WidgetType::checkbox;
+                    widgets[WIDX_CHECKBOX_2].setVisible();
                     widgets[WIDX_CHECKBOX_2].text = STR_STAFF_OPTION_WATER_GARDENS;
-                    widgets[WIDX_CHECKBOX_3].type = WidgetType::checkbox;
+                    widgets[WIDX_CHECKBOX_3].setVisible();
                     widgets[WIDX_CHECKBOX_3].text = STR_STAFF_OPTION_EMPTY_LITTER;
-                    widgets[WIDX_CHECKBOX_4].type = WidgetType::checkbox;
+                    widgets[WIDX_CHECKBOX_4].setVisible();
                     widgets[WIDX_CHECKBOX_4].text = STR_STAFF_OPTION_MOW_GRASS;
-                    widgets[WIDX_COSTUME_BOX].type = WidgetType::empty;
-                    widgets[WIDX_COSTUME_BTN].type = WidgetType::empty;
+                    widgets[WIDX_COSTUME_BOX].setHidden();
+                    widgets[WIDX_COSTUME_BTN].setHidden();
                     OptionsSetCheckboxValues();
                     break;
                 case StaffType::mechanic:
-                    widgets[WIDX_CHECKBOX_1].type = WidgetType::checkbox;
+                    widgets[WIDX_CHECKBOX_1].setVisible();
                     widgets[WIDX_CHECKBOX_1].text = STR_INSPECT_RIDES;
-                    widgets[WIDX_CHECKBOX_2].type = WidgetType::checkbox;
+                    widgets[WIDX_CHECKBOX_2].setVisible();
                     widgets[WIDX_CHECKBOX_2].text = STR_FIX_RIDES;
-                    widgets[WIDX_CHECKBOX_3].type = WidgetType::empty;
-                    widgets[WIDX_CHECKBOX_4].type = WidgetType::empty;
-                    widgets[WIDX_COSTUME_BOX].type = WidgetType::empty;
-                    widgets[WIDX_COSTUME_BTN].type = WidgetType::empty;
-                    widgets[WIDX_COSTUME_BTN].type = WidgetType::empty;
+                    widgets[WIDX_CHECKBOX_3].setHidden();
+                    widgets[WIDX_CHECKBOX_4].setHidden();
+                    widgets[WIDX_COSTUME_BOX].setHidden();
+                    widgets[WIDX_COSTUME_BTN].setHidden();
+                    widgets[WIDX_COSTUME_BTN].setHidden();
                     OptionsSetCheckboxValues();
                     break;
                 case StaffType::security:
@@ -1177,7 +1185,8 @@ namespace OpenRCT2::Ui::Windows
             gDropdown.items[1] = Dropdown::PlainMenuLabel(STR_FOLLOW_SUBJECT_TIP);
 
             WindowDropdownShowText(
-                { windowPos.x + widget->left, windowPos.y + widget->top }, widget->height(), colours[1], 0, 2);
+                { windowPos.x + widget->left, windowPos.y + widget->top }, widget->height(), colours[1],
+                { Dropdown::Flag::autoClose }, 2);
             gDropdown.defaultIndex = 0;
         }
 

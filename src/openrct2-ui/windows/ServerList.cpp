@@ -23,6 +23,7 @@
     #include <openrct2/drawing/Drawing.String.h>
     #include <openrct2/drawing/Drawing.h>
     #include <openrct2/drawing/Rectangle.h>
+    #include <openrct2/drawing/RenderTarget.h>
     #include <openrct2/drawing/Text.h>
     #include <openrct2/localisation/Formatter.h>
     #include <openrct2/network/Network.h>
@@ -234,7 +235,7 @@ namespace OpenRCT2::Ui::Windows
                     windowPos.x + listWidget.left + screenCoords.x + 2 - scrolls[0].contentOffsetX,
                     windowPos.y + listWidget.top + screenCoords.y + 2 - scrolls[0].contentOffsetY
                 };
-                WindowDropdownShowText(dropdownPos, 0, { Drawing::Colour::grey }, 0, dropdownItems);
+                WindowDropdownShowText(dropdownPos, 0, { Drawing::Colour::grey }, { Dropdown::Flag::autoClose }, dropdownItems);
             }
         }
 

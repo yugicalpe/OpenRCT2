@@ -10,26 +10,18 @@
 #include "../Paint.h"
 
 #include "../../Context.h"
-#include "../../Game.h"
 #include "../../GameState.h"
 #include "../../SpriteIds.h"
-#include "../../config/Config.h"
-#include "../../drawing/Drawing.h"
 #include "../../drawing/LightFX.h"
 #include "../../drawing/ScrollingText.h"
 #include "../../interface/Viewport.h"
-#include "../../localisation/Formatter.h"
-#include "../../localisation/Formatting.h"
+#include "../../localisation/StringIds.h"
 #include "../../object/EntranceObject.h"
 #include "../../object/ObjectManager.h"
 #include "../../object/StationObject.h"
 #include "../../profiling/Profiling.h"
-#include "../../ride/RideData.h"
 #include "../../ride/TrackDesign.h"
-#include "../../world/Entrance.h"
 #include "../../world/Footpath.h"
-#include "../../world/Park.h"
-#include "../../world/TileInspector.h"
 #include "../../world/tile_element/EntranceElement.h"
 #include "../support/WoodenSupports.h"
 #include "Paint.Entrance.h"
@@ -194,7 +186,7 @@ static void PaintRideEntranceExit(PaintSession& session, uint8_t direction, int3
             { { 2, 2, height + 30 }, { 28, 28, frontBoundBoxZ } });
     }
 
-    PaintUtilPushTunnelRotated(session, direction, height, TunnelType::SquareFlat);
+    PaintUtilPushTunnelRotated(session, direction, height, TunnelType::squareFlat);
 
     if (!entranceEl.isGhost())
         PaintRideEntranceExitScrollingText(session, entranceEl, *stationObj, direction, height);

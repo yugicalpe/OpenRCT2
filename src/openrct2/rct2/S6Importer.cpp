@@ -45,11 +45,11 @@
 #include "../scenario/Scenario.h"
 #include "../scenario/ScenarioRepository.h"
 #include "../scenario/ScenarioSources.h"
-#include "../world/Entrance.h"
 #include "../world/Map.h"
 #include "../world/MapAnimation.h"
 #include "../world/Park.h"
 #include "../world/Scenery.h"
+#include "../world/TileElementsView.h"
 #include "../world/TilePointerIndex.hpp"
 #include "../world/Weather.h"
 #include "../world/tile_element/BannerElement.h"
@@ -270,11 +270,11 @@ namespace OpenRCT2::RCT2
                 dst->SourceIndex = -1;
                 if (dst->Category == Scenario::Category::real)
                 {
-                    dst->SourceGame = ScenarioSource::Real;
+                    dst->SourceGame = ScenarioSource::real;
                 }
                 else
                 {
-                    dst->SourceGame = ScenarioSource::Other;
+                    dst->SourceGame = ScenarioSource::other;
                 }
             }
 
@@ -1032,22 +1032,17 @@ namespace OpenRCT2::RCT2
                     {
                         const CoordsXYZ coords{ mapAnimation.x, mapAnimation.y, mapAnimation.BaseZ * kCoordsZStep };
                         const TileCoordsXYZ tileCoords{ coords };
-                        TileElement* tileElement = MapGetFirstElementAt(tileCoords);
-                        if (tileElement == nullptr)
-                        {
-                            continue;
-                        }
 
-                        do
+                        for (auto* wallElement : TileElementsView<WallElement>(tileCoords))
                         {
-                            if (tileElement->getType() != TileElementType::Wall || tileElement->baseHeight != tileCoords.z)
+                            if (wallElement->baseHeight != tileCoords.z)
                             {
                                 continue;
                             }
 
-                            tileElement->asWall()->SetIsAnimating(true);
+                            wallElement->SetIsAnimating(true);
                             MapAnimations::MarkTileForUpdate(tileCoords);
-                        } while (!(tileElement++)->isLastForTile());
+                        }
                         break;
                     }
                 }
@@ -1301,7 +1296,7 @@ namespace OpenRCT2::RCT2
                     {
                         // Add a default surface element, we always need at least one element per tile
                         auto& dstElement = tileElements.emplace_back();
-                        dstElement.ClearAs(TileElementType::Surface);
+                        dstElement.ClearAs(TileElementType::surface);
                         dstElement.setLastForTile(true);
                     }
 
@@ -2286,8 +2281,8 @@ namespace OpenRCT2::RCT2
         dst->TargetY = src->TargetY;
         dst->Iteration = src->Iteration;
         dst->FountainType = RCT12MiscEntityType(src->Type) == RCT12MiscEntityType::jumpingFountainSnow
-            ? ::JumpingFountainType::Snow
-            : ::JumpingFountainType::Water;
+            ? ::JumpingFountainType::snow
+            : ::JumpingFountainType::water;
     }
 
     template<>

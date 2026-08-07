@@ -20,23 +20,15 @@
 #include "../core/FileStream.h"
 #include "../core/Guard.hpp"
 #include "../core/IStream.hpp"
-#include "../core/MemoryStream.h"
 #include "../core/Numerics.hpp"
 #include "../core/Path.hpp"
 #include "../core/String.hpp"
 #include "../localisation/LocalisationService.h"
-#include "../object/Object.h"
 #include "../park/Legacy.h"
-#include "../platform/Platform.h"
 #include "../sawyer_coding/SawyerChunkReader.h"
-#include "../sawyer_coding/SawyerChunkWriter.h"
 #include "../sawyer_coding/SawyerCoding.h"
-#include "../scenario/ScenarioRepository.h"
 #include "Object.h"
 #include "ObjectFactory.h"
-#include "ObjectList.h"
-#include "ObjectManager.h"
-#include "RideObject.h"
 
 #include <memory>
 #include <unordered_map>
@@ -99,7 +91,7 @@ namespace OpenRCT2
             // All official DAT files have a JSON object counterpart. Avoid loading the obsolete .DAT versions,
             // which can happen if the user copies the official DAT objects to their custom content folder.
             if (object == nullptr
-                || (object->GetGeneration() == ObjectGeneration::DAT
+                || (object->GetGeneration() == ObjectGeneration::dat
                     && object->GetObjectEntry().GetSourceGame() != ObjectSourceGame::custom))
             {
                 return std::nullopt;
@@ -245,7 +237,7 @@ namespace OpenRCT2
 
         const ObjectRepositoryItem* FindObject(const ObjectEntryDescriptor& entry) const override final
         {
-            if (entry.Generation == ObjectGeneration::DAT)
+            if (entry.Generation == ObjectGeneration::dat)
                 return FindObject(&entry.Entry);
 
             return FindObject(entry.Identifier);
@@ -312,7 +304,7 @@ namespace OpenRCT2
         {
             LOG_VERBOSE("Adding object: [%s]", std::string(objectName).c_str());
             u8string path;
-            if (generation == ObjectGeneration::JSON)
+            if (generation == ObjectGeneration::json)
             {
                 path = GetPathForNewObject(objectName);
             }
@@ -435,7 +427,7 @@ namespace OpenRCT2
                 return true;
             }
             // When there is a conflict between a DAT file and a JSON file, the JSON should take precedence.
-            else if (item.Generation == ObjectGeneration::JSON && conflict->Generation == ObjectGeneration::DAT)
+            else if (item.Generation == ObjectGeneration::json && conflict->Generation == ObjectGeneration::dat)
             {
                 const auto id = conflict->Id;
                 const auto oldPath = conflict->Path;

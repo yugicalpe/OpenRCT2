@@ -1,5 +1,6 @@
 #include "TrackIteration.h"
 
+#include "../ride/RideConstruction.h"
 #include "../ui/WindowManager.h"
 #include "../world/Map.h"
 #include "../world/tile_element/TileElement.h"
@@ -448,7 +449,7 @@ namespace OpenRCT2
      */
     bool findTrackGap(const Ride& ride, const CoordsXYE& input, CoordsXYE* output)
     {
-        if (input.element == nullptr || input.element->getType() != TileElementType::Track)
+        if (input.element == nullptr || input.element->getType() != TileElementType::track)
             return false;
 
         const auto& rtd = ride.getRideTypeDescriptor();
@@ -457,7 +458,7 @@ namespace OpenRCT2
 
         auto* windowMgr = Ui::GetWindowManager();
         const WindowBase* w = windowMgr->FindByClass(WindowClass::rideConstruction);
-        if (w != nullptr && _rideConstructionState != RideConstructionState::State0 && _currentRideIndex == ride.id)
+        if (w != nullptr && _rideConstructionState != RideConstructionState::state0 && _currentRideIndex == ride.id)
         {
             RideConstructionInvalidateCurrentTrack();
         }

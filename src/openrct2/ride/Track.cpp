@@ -10,12 +10,7 @@
 #include "Track.h"
 
 #include "../Diagnostic.h"
-#include "../GameState.h"
 #include "../actions/ResultWithMessage.h"
-#include "../audio/Audio.h"
-#include "../interface/Viewport.h"
-#include "../network/Network.h"
-#include "../world/Footpath.h"
 #include "../world/Map.h"
 #include "../world/tile_element/SmallSceneryElement.h"
 #include "../world/tile_element/TileElement.h"
@@ -24,7 +19,6 @@
 #include "RideData.h"
 #include "Station.h"
 #include "TrackData.h"
-#include "TrackDesign.h"
 #include "ted/TrackElementDescriptor.h"
 
 #include <cassert>
@@ -63,7 +57,7 @@ static TileElement* find_station_element(const CoordsXYZD& loc, RideId rideIndex
     {
         if (loc.z != tileElement->getBaseZ())
             continue;
-        if (tileElement->getType() != TileElementType::Track)
+        if (tileElement->getType() != TileElementType::track)
             continue;
         if (tileElement->getDirection() != loc.direction)
             continue;
@@ -471,13 +465,13 @@ bool TrackGetIsSheltered(const CoordsXYZ& input)
         if (tileElement->getBaseZ() <= input.z)
             continue;
 
-        if (tileElement->getType() == TileElementType::LargeScenery)
+        if (tileElement->getType() == TileElementType::largeScenery)
             return true;
 
-        if (tileElement->getType() == TileElementType::Path)
+        if (tileElement->getType() == TileElementType::path)
             return true;
 
-        if (tileElement->getType() != TileElementType::SmallScenery)
+        if (tileElement->getType() != TileElementType::smallScenery)
             continue;
 
         auto* sceneryEntry = tileElement->asSmallScenery()->GetEntry();

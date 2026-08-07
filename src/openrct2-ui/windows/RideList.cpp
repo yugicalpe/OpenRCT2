@@ -313,7 +313,8 @@ namespace OpenRCT2::Ui::Windows
                 gDropdown.items[0] = Dropdown::PlainMenuLabel(STR_CLOSE_ALL);
                 gDropdown.items[1] = Dropdown::PlainMenuLabel(STR_OPEN_ALL);
                 WindowDropdownShowText(
-                    { windowPos.x + widget.left, windowPos.y + widget.top }, widget.height() - 1, colours[1], 0, 2);
+                    { windowPos.x + widget.left, windowPos.y + widget.top }, widget.height() - 1, colours[1],
+                    { Dropdown::Flag::autoClose }, 2);
             }
             else if (widgetIndex == WIDX_HEADER_CUSTOMISE)
             {
@@ -349,7 +350,7 @@ namespace OpenRCT2::Ui::Windows
 
                 WindowDropdownShowTextCustomWidth(
                     { windowPos.x + headerWidget.left, windowPos.y + headerWidget.top }, headerWidget.height() - 1, colours[1],
-                    0, Dropdown::Flag::StayOpen, numItems, totalWidth);
+                    0, {}, numItems, totalWidth);
             }
         }
 
@@ -541,9 +542,9 @@ namespace OpenRCT2::Ui::Windows
 
             if (ThemeGetFlags() & UITHEME_FLAG_USE_LIGHTS_RIDE)
             {
-                widgets[WIDX_OPEN_CLOSE_ALL].type = WidgetType::empty;
-                widgets[WIDX_CLOSE_LIGHT].type = WidgetType::imgBtn;
-                widgets[WIDX_OPEN_LIGHT].type = WidgetType::imgBtn;
+                widgets[WIDX_OPEN_CLOSE_ALL].setHidden();
+                widgets[WIDX_CLOSE_LIGHT].setVisible();
+                widgets[WIDX_OPEN_LIGHT].setVisible();
 
                 const auto& gameState = getGameState();
                 const auto& rideManager = RideManager(gameState);
@@ -570,14 +571,13 @@ namespace OpenRCT2::Ui::Windows
             }
             else
             {
-                widgets[WIDX_OPEN_CLOSE_ALL].type = WidgetType::flatBtn;
-                widgets[WIDX_CLOSE_LIGHT].type = WidgetType::empty;
-                widgets[WIDX_OPEN_LIGHT].type = WidgetType::empty;
+                widgets[WIDX_OPEN_CLOSE_ALL].setVisible();
+                widgets[WIDX_CLOSE_LIGHT].setHidden();
+                widgets[WIDX_OPEN_LIGHT].setHidden();
                 widgets[WIDX_QUICK_DEMOLISH].top = widgets[WIDX_OPEN_CLOSE_ALL].bottom + 3;
             }
             widgets[WIDX_QUICK_DEMOLISH].bottom = widgets[WIDX_QUICK_DEMOLISH].top + 23;
-            widgets[WIDX_QUICK_DEMOLISH].type = Network::GetMode() != Network::Mode::client ? WidgetType::flatBtn
-                                                                                            : WidgetType::empty;
+            widgets[WIDX_QUICK_DEMOLISH].setVisible(Network::GetMode() != Network::Mode::client);
         }
 
         /**

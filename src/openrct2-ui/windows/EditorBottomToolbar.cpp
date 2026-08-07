@@ -12,8 +12,6 @@
 #include <openrct2-ui/interface/Widget.h>
 #include <openrct2-ui/windows/Windows.h>
 #include <openrct2/Context.h>
-#include <openrct2/Editor.h>
-#include <openrct2/EditorObjectSelectionSession.h>
 #include <openrct2/Game.h>
 #include <openrct2/GameState.h>
 #include <openrct2/Input.h>
@@ -26,6 +24,7 @@
 #include <openrct2/drawing/Text.h>
 #include <openrct2/management/Research.h>
 #include <openrct2/scenario/Scenario.h>
+#include <openrct2/scenes/editor/EditorController.h>
 #include <openrct2/scripting/ScriptEngine.h>
 #include <openrct2/ui/WindowManager.h>
 #include <openrct2/windows/Intent.h>
@@ -102,10 +101,10 @@ namespace OpenRCT2::Ui::Windows
             widgets[WIDX_NEXT_STEP_BUTTON].left = screenWidth - 198;
             widgets[WIDX_NEXT_STEP_BUTTON].right = screenWidth - 3;
 
-            widgets[WIDX_PREVIOUS_STEP_BUTTON].type = WidgetType::flatBtn;
-            widgets[WIDX_NEXT_STEP_BUTTON].type = WidgetType::flatBtn;
-            widgets[WIDX_PREVIOUS_IMAGE].type = WidgetType::imgBtn;
-            widgets[WIDX_NEXT_IMAGE].type = WidgetType::imgBtn;
+            widgets[WIDX_PREVIOUS_STEP_BUTTON].setHidden(false);
+            widgets[WIDX_NEXT_STEP_BUTTON].setHidden(false);
+            widgets[WIDX_PREVIOUS_IMAGE].setHidden(false);
+            widgets[WIDX_NEXT_IMAGE].setHidden(false);
 
             auto& gameState = getGameState();
             if (gLegacyScene == LegacyScene::trackDesignsManager || gameState.editorStep == Editor::Step::saveScenario)
@@ -129,8 +128,8 @@ namespace OpenRCT2::Ui::Windows
 
         void onDraw(RenderTarget& rt) override
         {
-            auto drawPreviousButton = widgets[WIDX_PREVIOUS_STEP_BUTTON].type != WidgetType::empty;
-            auto drawNextButton = widgets[WIDX_NEXT_STEP_BUTTON].type != WidgetType::empty;
+            auto drawPreviousButton = widgets[WIDX_PREVIOUS_STEP_BUTTON].isVisible();
+            auto drawNextButton = widgets[WIDX_NEXT_STEP_BUTTON].isVisible();
 
             if (drawPreviousButton)
                 DrawLeftButtonBack(rt);
@@ -222,7 +221,7 @@ namespace OpenRCT2::Ui::Windows
             auto* windowMgr = GetWindowManager();
             windowMgr->CloseByClass(WindowClass::editorObjectSelection);
 
-            FinishObjectSelection();
+            Editor::FinishObjectSelection();
             if (gLegacyScene == LegacyScene::trackDesigner)
             {
                 ContextOpenWindow(WindowClass::constructRide);
@@ -326,14 +325,14 @@ namespace OpenRCT2::Ui::Windows
 
         void HidePreviousStepButton()
         {
-            widgets[WIDX_PREVIOUS_STEP_BUTTON].type = WidgetType::empty;
-            widgets[WIDX_PREVIOUS_IMAGE].type = WidgetType::empty;
+            widgets[WIDX_PREVIOUS_STEP_BUTTON].setHidden(true);
+            widgets[WIDX_PREVIOUS_IMAGE].setHidden(true);
         }
 
         void HideNextStepButton()
         {
-            widgets[WIDX_NEXT_STEP_BUTTON].type = WidgetType::empty;
-            widgets[WIDX_NEXT_IMAGE].type = WidgetType::empty;
+            widgets[WIDX_NEXT_STEP_BUTTON].setHidden(true);
+            widgets[WIDX_NEXT_IMAGE].setHidden(true);
         }
 
         void DrawLeftButtonBack(RenderTarget& rt)

@@ -260,7 +260,7 @@ void Vehicle::UpdateMotionBoatHire()
                         return;
 
                     bool do_Loc6DAA97 = false;
-                    if (sub_state != BoatHireSubState::EnteringReturnPosition)
+                    if (sub_state != BoatHireSubState::enteringReturnPosition)
                     {
                         do_Loc6DAA97 = true;
                     }
@@ -400,12 +400,12 @@ void Vehicle::UpdateBoatLocation()
 
     if (location.ToTileStart() == returnPosition.ToCoordsXY())
     {
-        sub_state = BoatHireSubState::EnteringReturnPosition;
+        sub_state = BoatHireSubState::enteringReturnPosition;
         BoatLocation = location.ToTileStart();
         return;
     }
 
-    sub_state = BoatHireSubState::Normal;
+    sub_state = BoatHireSubState::rowing;
     uint8_t curDirection = ((orientation + 19) >> 3) & 3;
     uint8_t randDirection = ScenarioRand() & 3;
 
@@ -468,7 +468,7 @@ static bool vehicle_boat_is_location_accessible(const CoordsXYZ& location)
         if (tileElement->isGhost())
             continue;
 
-        if (tileElement->getType() == TileElementType::Surface)
+        if (tileElement->getType() == TileElementType::surface)
         {
             int32_t waterZ = tileElement->asSurface()->GetWaterHeight();
             if (location.z != waterZ)

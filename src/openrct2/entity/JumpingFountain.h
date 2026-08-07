@@ -10,7 +10,6 @@
 #pragma once
 
 #include "../core/FlagHolder.hpp"
-#include "../world/Location.hpp"
 #include "EntityBase.h"
 
 namespace OpenRCT2
@@ -32,8 +31,8 @@ namespace OpenRCT2
 
     enum class JumpingFountainType : uint8_t
     {
-        Water,
-        Snow
+        water,
+        snow
     };
 
     struct JumpingFountain : EntityBase

@@ -15,6 +15,8 @@
 #include <openrct2/ride/ted/TrackElemType.h>
 #include <vector>
 
+struct ScreenCoordsXY;
+
 namespace OpenRCT2
 {
     namespace TrackMetadata
@@ -25,7 +27,7 @@ namespace OpenRCT2
 
     enum class RideConstructionState : uint8_t;
 
-    struct SpecialElement
+    struct SpecialDropdownElement
     {
         TrackElemType TrackType;
         bool Disabled;
@@ -34,7 +36,7 @@ namespace OpenRCT2
     struct SpecialElementsDropdownState
     {
         bool HasActiveElements = false;
-        std::vector<SpecialElement> Elements{};
+        std::vector<SpecialDropdownElement> Elements{};
         size_t PreferredNumRows{};
     };
 

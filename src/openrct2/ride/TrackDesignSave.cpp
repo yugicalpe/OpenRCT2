@@ -9,8 +9,6 @@
 
 #include "../Context.h"
 #include "../Diagnostic.h"
-#include "../Game.h"
-#include "../audio/Audio.h"
 #include "../drawing/Drawing.h"
 #include "../interface/Viewport.h"
 #include "../localisation/Formatter.h"
@@ -19,15 +17,9 @@
 #include "../object/FootpathRailingsObject.h"
 #include "../object/FootpathSurfaceObject.h"
 #include "../object/LargeSceneryObject.h"
-#include "../object/ObjectList.h"
 #include "../object/ObjectManager.h"
 #include "../rct2/RCT2.h"
-#include "../sawyer_coding/SawyerCoding.h"
-#include "../windows/Intent.h"
-#include "../world/Footpath.h"
 #include "../world/Map.h"
-#include "../world/Scenery.h"
-#include "../world/tile_element/BannerElement.h"
 #include "../world/tile_element/EntranceElement.h"
 #include "../world/tile_element/LargeSceneryElement.h"
 #include "../world/tile_element/PathElement.h"
@@ -35,11 +27,7 @@
 #include "../world/tile_element/TileElement.h"
 #include "../world/tile_element/TrackElement.h"
 #include "../world/tile_element/WallElement.h"
-#include "RideData.h"
-#include "Station.h"
-#include "TrackData.h"
 #include "TrackDesign.h"
-#include "TrackDesignRepository.h"
 
 #include <cassert>
 
@@ -152,12 +140,12 @@ static size_t TrackDesignSaveGetTotalElementCount(TileElement* tileElement)
 {
     switch (tileElement->getType())
     {
-        case TileElementType::Path:
-        case TileElementType::SmallScenery:
-        case TileElementType::Wall:
+        case TileElementType::path:
+        case TileElementType::smallScenery:
+        case TileElementType::wall:
             return 1;
 
-        case TileElementType::LargeScenery:
+        case TileElementType::largeScenery:
         {
             auto* sceneryEntry = tileElement->asLargeScenery()->GetEntry();
             return sceneryEntry->tiles.size();
@@ -395,13 +383,13 @@ static TrackDesignAddStatus TrackDesignSaveAddTileElement(const CoordsXY& loc, T
 
     switch (tileElement->getType())
     {
-        case TileElementType::SmallScenery:
+        case TileElementType::smallScenery:
             return TrackDesignSaveAddSmallScenery(loc, tileElement->asSmallScenery());
-        case TileElementType::LargeScenery:
+        case TileElementType::largeScenery:
             return TrackDesignSaveAddLargeScenery(loc, tileElement->asLargeScenery());
-        case TileElementType::Wall:
+        case TileElementType::wall:
             return TrackDesignSaveAddWall(loc, tileElement->asWall());
-        case TileElementType::Path:
+        case TileElementType::path:
             return TrackDesignSaveAddFootpath(loc, tileElement->asPath());
         default:
             return TrackDesignAddStatus::Fail(STR_UNKNOWN_OBJECT_TYPE);
@@ -545,16 +533,16 @@ static void TrackDesignSaveRemoveTileElement(const CoordsXY& loc, TileElement* t
 {
     switch (tileElement->getType())
     {
-        case TileElementType::SmallScenery:
+        case TileElementType::smallScenery:
             TrackDesignSaveRemoveSmallScenery(loc, tileElement->asSmallScenery());
             break;
-        case TileElementType::LargeScenery:
+        case TileElementType::largeScenery:
             TrackDesignSaveRemoveLargeScenery(loc, tileElement->asLargeScenery());
             break;
-        case TileElementType::Wall:
+        case TileElementType::wall:
             TrackDesignSaveRemoveWall(loc, tileElement->asWall());
             break;
-        case TileElementType::Path:
+        case TileElementType::path:
             TrackDesignSaveRemoveFootpath(loc, tileElement->asPath());
             break;
         default:
@@ -566,15 +554,15 @@ static bool TrackDesignSaveShouldSelectSceneryAround(RideId rideIndex, TileEleme
 {
     switch (tileElement->getType())
     {
-        case TileElementType::Path:
+        case TileElementType::path:
             if (tileElement->asPath()->IsQueue() && tileElement->asPath()->GetRideIndex() == rideIndex)
                 return true;
             break;
-        case TileElementType::Track:
+        case TileElementType::track:
             if (tileElement->asTrack()->GetRideIndex() == rideIndex)
                 return true;
             break;
-        case TileElementType::Entrance:
+        case TileElementType::entrance:
             // FIXME: This will always break and return false!
             if (tileElement->asEntrance()->GetEntranceType() != ENTRANCE_TYPE_RIDE_ENTRANCE)
                 break;
@@ -605,19 +593,19 @@ static void TrackDesignSaveShouldSelectNearbySceneryForTile(RideId rideIndex, in
                 ViewportInteractionItem interactionType = ViewportInteractionItem::none;
                 switch (tileElement->getType())
                 {
-                    case TileElementType::Path:
+                    case TileElementType::path:
                         if (!tileElement->asPath()->IsQueue())
                             interactionType = ViewportInteractionItem::footpath;
                         else if (tileElement->asPath()->GetRideIndex() == rideIndex)
                             interactionType = ViewportInteractionItem::footpath;
                         break;
-                    case TileElementType::SmallScenery:
+                    case TileElementType::smallScenery:
                         interactionType = ViewportInteractionItem::scenery;
                         break;
-                    case TileElementType::Wall:
+                    case TileElementType::wall:
                         interactionType = ViewportInteractionItem::wall;
                         break;
-                    case TileElementType::LargeScenery:
+                    case TileElementType::largeScenery:
                         interactionType = ViewportInteractionItem::largeScenery;
                         break;
                     default:

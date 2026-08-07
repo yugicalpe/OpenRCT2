@@ -11,21 +11,8 @@
 
     #include "ScTile.hpp"
 
-    #include "../../../Context.h"
-    #include "../../../core/Guard.hpp"
-    #include "../../../drawing/ScrollingText.h"
-    #include "../../../entity/EntityRegistry.h"
-    #include "../../../object/LargeSceneryEntry.h"
-    #include "../../../world/Footpath.h"
     #include "../../../world/Map.h"
-    #include "../../../world/Scenery.h"
     #include "../../../world/tile_element/LargeSceneryElement.h"
-    #include "../../ScriptEngine.h"
-    #include "ScTileElement.hpp"
-
-    #include <cstdio>
-    #include <cstring>
-    #include <utility>
 
 namespace OpenRCT2::Scripting
 {
@@ -106,7 +93,7 @@ namespace OpenRCT2::Scripting
                     auto numToInsert = numElements - currentNumElements;
                     for (size_t i = 0; i < numToInsert; i++)
                     {
-                        TileElementInsert(pos, 0, TileElementType::Surface);
+                        TileElementInsert(pos, 0, TileElementType::surface);
                     }
 
                     // Copy data to element span
@@ -155,7 +142,7 @@ namespace OpenRCT2::Scripting
             std::vector<TileElement> data(first, first + origNumElements);
 
             auto pos = TileCoordsXYZ(TileCoordsXY(coords), 0).ToCoordsXYZ();
-            auto newElement = TileElementInsert(pos, 0, TileElementType::Surface);
+            auto newElement = TileElementInsert(pos, 0, TileElementType::surface);
             if (newElement == nullptr)
             {
                 JS_ThrowPlainError(ctx, "Unable to allocate element.");
@@ -200,7 +187,7 @@ namespace OpenRCT2::Scripting
         if (index < GetNumElements(first))
         {
             auto element = &first[index];
-            if (element->getType() != TileElementType::LargeScenery
+            if (element->getType() != TileElementType::largeScenery
                 || element->asLargeScenery()->GetEntry()->scrolling_mode == kScrollingModeNone
                 || ScTileElement::GetOtherLargeSceneryElement(coords, element->asLargeScenery()) == nullptr)
             {

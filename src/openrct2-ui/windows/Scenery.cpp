@@ -39,7 +39,9 @@
 #include <openrct2/drawing/ColourMap.h>
 #include <openrct2/drawing/Drawing.h>
 #include <openrct2/drawing/Rectangle.h>
+#include <openrct2/drawing/RenderTarget.h>
 #include <openrct2/drawing/Text.h>
+#include <openrct2/interface/WidgetIndexGlobals.h>
 #include <openrct2/localisation/Formatter.h>
 #include <openrct2/management/Research.h>
 #include <openrct2/network/Network.h>
@@ -723,31 +725,31 @@ namespace OpenRCT2::Ui::Windows
             setWidgetPressed(WIDX_SCENERY_EYEDROPPER_BUTTON, gWindowSceneryEyedropperEnabled);
             setWidgetPressed(WIDX_SCENERY_BUILD_CLUSTER_BUTTON, gWindowSceneryScatterEnabled);
 
-            widgets[WIDX_SCENERY_ROTATE_OBJECTS_BUTTON].type = WidgetType::empty;
-            widgets[WIDX_SCENERY_BUILD_CLUSTER_BUTTON].type = WidgetType::empty;
-            widgets[WIDX_RESTRICT_SCENERY].type = WidgetType::empty;
+            widgets[WIDX_SCENERY_ROTATE_OBJECTS_BUTTON].setHidden();
+            widgets[WIDX_SCENERY_BUILD_CLUSTER_BUTTON].setHidden();
+            widgets[WIDX_RESTRICT_SCENERY].setHidden();
 
             const auto tabSelectedScenery = GetSelectedScenery(tabIndex);
             if (!tabSelectedScenery.IsUndefined())
             {
                 if (tabSelectedScenery.SceneryType == SCENERY_TYPE_SMALL)
                 {
-                    widgets[WIDX_SCENERY_BUILD_CLUSTER_BUTTON].type = WidgetType::flatBtn;
+                    widgets[WIDX_SCENERY_BUILD_CLUSTER_BUTTON].setVisible();
 
                     auto* sceneryEntry = ObjectEntryManager::GetObjectEntry<SmallSceneryEntry>(tabSelectedScenery.EntryIndex);
                     if (sceneryEntry != nullptr && sceneryEntry->flags.has(SmallSceneryFlag::isRotatable))
                     {
-                        widgets[WIDX_SCENERY_ROTATE_OBJECTS_BUTTON].type = WidgetType::flatBtn;
+                        widgets[WIDX_SCENERY_ROTATE_OBJECTS_BUTTON].setVisible();
                     }
                 }
                 else if (tabSelectedScenery.SceneryType >= SCENERY_TYPE_LARGE)
                 {
-                    widgets[WIDX_SCENERY_ROTATE_OBJECTS_BUTTON].type = WidgetType::flatBtn;
+                    widgets[WIDX_SCENERY_ROTATE_OBJECTS_BUTTON].setVisible();
                 }
 
                 if (gLegacyScene == LegacyScene::scenarioEditor || getGameState().cheats.sandboxMode)
                 {
-                    widgets[WIDX_RESTRICT_SCENERY].type = WidgetType::button;
+                    widgets[WIDX_RESTRICT_SCENERY].setVisible();
                     setWidgetPressed(WIDX_RESTRICT_SCENERY, IsSceneryItemRestricted(tabSelectedScenery));
                 }
             }
@@ -756,15 +758,15 @@ namespace OpenRCT2::Ui::Windows
             widgets[WIDX_SCENERY_SECONDARY_COLOUR_BUTTON].image = getColourButtonImage(_scenerySecondaryColour);
             widgets[WIDX_SCENERY_TERTIARY_COLOUR_BUTTON].image = getColourButtonImage(_sceneryTertiaryColour);
 
-            widgets[WIDX_SCENERY_PRIMARY_COLOUR_BUTTON].type = WidgetType::empty;
-            widgets[WIDX_SCENERY_SECONDARY_COLOUR_BUTTON].type = WidgetType::empty;
-            widgets[WIDX_SCENERY_TERTIARY_COLOUR_BUTTON].type = WidgetType::empty;
+            widgets[WIDX_SCENERY_PRIMARY_COLOUR_BUTTON].setHidden();
+            widgets[WIDX_SCENERY_SECONDARY_COLOUR_BUTTON].setHidden();
+            widgets[WIDX_SCENERY_TERTIARY_COLOUR_BUTTON].setHidden();
 
             if (_sceneryPaintEnabled)
             { // repaint coloured scenery tool is on
-                widgets[WIDX_SCENERY_PRIMARY_COLOUR_BUTTON].type = WidgetType::colourBtn;
-                widgets[WIDX_SCENERY_SECONDARY_COLOUR_BUTTON].type = WidgetType::colourBtn;
-                widgets[WIDX_SCENERY_TERTIARY_COLOUR_BUTTON].type = WidgetType::colourBtn;
+                widgets[WIDX_SCENERY_PRIMARY_COLOUR_BUTTON].setVisible();
+                widgets[WIDX_SCENERY_SECONDARY_COLOUR_BUTTON].setVisible();
+                widgets[WIDX_SCENERY_TERTIARY_COLOUR_BUTTON].setVisible();
             }
             else if (!tabSelectedScenery.IsUndefined())
             {
@@ -773,7 +775,7 @@ namespace OpenRCT2::Ui::Windows
                     auto* bannerEntry = ObjectEntryManager::GetObjectEntry<BannerSceneryEntry>(tabSelectedScenery.EntryIndex);
                     if (bannerEntry != nullptr && bannerEntry->flags & BANNER_ENTRY_FLAG_HAS_PRIMARY_COLOUR)
                     {
-                        widgets[WIDX_SCENERY_PRIMARY_COLOUR_BUTTON].type = WidgetType::colourBtn;
+                        widgets[WIDX_SCENERY_PRIMARY_COLOUR_BUTTON].setVisible();
                     }
                 }
                 else if (tabSelectedScenery.SceneryType == SCENERY_TYPE_LARGE)
@@ -784,34 +786,35 @@ namespace OpenRCT2::Ui::Windows
                         if (sceneryEntry->flags.has(LargeSceneryFlag::hasPrimaryColour)
                             && !sceneryEntry->flags.has(LargeSceneryFlag::hidePrimaryRemapButton))
                         {
-                            widgets[WIDX_SCENERY_PRIMARY_COLOUR_BUTTON].type = WidgetType::colourBtn;
+                            widgets[WIDX_SCENERY_PRIMARY_COLOUR_BUTTON].setVisible();
                         }
                         if (sceneryEntry->flags.has(LargeSceneryFlag::hasSecondaryColour)
                             && !sceneryEntry->flags.has(LargeSceneryFlag::hideSecondaryRemapButton))
                         {
-                            widgets[WIDX_SCENERY_SECONDARY_COLOUR_BUTTON].type = WidgetType::colourBtn;
+                            widgets[WIDX_SCENERY_SECONDARY_COLOUR_BUTTON].setVisible();
                         }
                         if (sceneryEntry->flags.has(LargeSceneryFlag::hasTertiaryColour))
                         {
-                            widgets[WIDX_SCENERY_TERTIARY_COLOUR_BUTTON].type = WidgetType::colourBtn;
+                            widgets[WIDX_SCENERY_TERTIARY_COLOUR_BUTTON].setVisible();
                         }
                     }
                 }
                 else if (tabSelectedScenery.SceneryType == SCENERY_TYPE_WALL)
                 {
                     auto* wallEntry = ObjectEntryManager::GetObjectEntry<WallSceneryEntry>(tabSelectedScenery.EntryIndex);
-                    if (wallEntry != nullptr && wallEntry->flags & (WALL_SCENERY_HAS_PRIMARY_COLOUR | WALL_SCENERY_HAS_GLASS))
+                    if (wallEntry != nullptr
+                        && wallEntry->flags.hasAny(WallSceneryFlag::hasPrimaryColour, WallSceneryFlag::hasGlass))
                     {
-                        widgets[WIDX_SCENERY_PRIMARY_COLOUR_BUTTON].type = WidgetType::colourBtn;
+                        widgets[WIDX_SCENERY_PRIMARY_COLOUR_BUTTON].setVisible();
 
-                        if (wallEntry->flags & WALL_SCENERY_HAS_SECONDARY_COLOUR)
+                        if (wallEntry->flags.has(WallSceneryFlag::hasSecondaryColour))
                         {
-                            widgets[WIDX_SCENERY_SECONDARY_COLOUR_BUTTON].type = WidgetType::colourBtn;
+                            widgets[WIDX_SCENERY_SECONDARY_COLOUR_BUTTON].setVisible();
 
                             if (wallEntry->flags2 & WALL_SCENERY_2_NO_SELECT_PRIMARY_COLOUR)
-                                widgets[WIDX_SCENERY_PRIMARY_COLOUR_BUTTON].type = WidgetType::empty;
-                            if (wallEntry->flags & WALL_SCENERY_HAS_TERTIARY_COLOUR)
-                                widgets[WIDX_SCENERY_TERTIARY_COLOUR_BUTTON].type = WidgetType::colourBtn;
+                                widgets[WIDX_SCENERY_PRIMARY_COLOUR_BUTTON].setHidden();
+                            if (wallEntry->flags.has(WallSceneryFlag::hasTertiaryColour))
+                                widgets[WIDX_SCENERY_TERTIARY_COLOUR_BUTTON].setVisible();
                         }
                     }
                 }
@@ -822,12 +825,12 @@ namespace OpenRCT2::Ui::Windows
                     if (sceneryEntry != nullptr
                         && sceneryEntry->flags.hasAny(SmallSceneryFlag::hasPrimaryColour, SmallSceneryFlag::hasGlass))
                     {
-                        widgets[WIDX_SCENERY_PRIMARY_COLOUR_BUTTON].type = WidgetType::colourBtn;
+                        widgets[WIDX_SCENERY_PRIMARY_COLOUR_BUTTON].setVisible();
 
                         if (sceneryEntry->flags.has(SmallSceneryFlag::hasSecondaryColour))
-                            widgets[WIDX_SCENERY_SECONDARY_COLOUR_BUTTON].type = WidgetType::colourBtn;
+                            widgets[WIDX_SCENERY_SECONDARY_COLOUR_BUTTON].setVisible();
                         if (sceneryEntry->flags.has(SmallSceneryFlag::hasTertiaryColour))
-                            widgets[WIDX_SCENERY_TERTIARY_COLOUR_BUTTON].type = WidgetType::colourBtn;
+                            widgets[WIDX_SCENERY_TERTIARY_COLOUR_BUTTON].setVisible();
                     }
                 }
             }
@@ -881,8 +884,8 @@ namespace OpenRCT2::Ui::Windows
             widgets[WIDX_SCENERY_TERTIARY_COLOUR_BUTTON].right = windowWidth - 8;
 
             const bool canFit = widgets[WIDX_SCENERY_BUILD_CLUSTER_BUTTON].top < height;
-            widgets[WIDX_SCENERY_EYEDROPPER_BUTTON].type = canFit ? WidgetType::flatBtn : WidgetType::empty;
-            widgets[WIDX_SCENERY_BUILD_CLUSTER_BUTTON].type = canFit ? WidgetType::flatBtn : WidgetType::empty;
+            widgets[WIDX_SCENERY_EYEDROPPER_BUTTON].setVisible(canFit);
+            widgets[WIDX_SCENERY_BUILD_CLUSTER_BUTTON].setVisible(canFit);
         }
 
         void onDraw(RenderTarget& rt) override
@@ -1634,10 +1637,10 @@ namespace OpenRCT2::Ui::Windows
 
                 auto imageId = ImageId(wallEntry->image);
                 auto spriteTop = (wallEntry->height * 2) + 0x32;
-                if (wallEntry->flags & WALL_SCENERY_HAS_GLASS)
+                if (wallEntry->flags.has(WallSceneryFlag::hasGlass))
                 {
                     imageId = imageId.WithPrimary(_sceneryPrimaryColour);
-                    if (wallEntry->flags & WALL_SCENERY_HAS_SECONDARY_COLOUR)
+                    if (wallEntry->flags.has(WallSceneryFlag::hasSecondaryColour))
                     {
                         imageId = imageId.WithSecondary(_scenerySecondaryColour);
                     }
@@ -1649,17 +1652,17 @@ namespace OpenRCT2::Ui::Windows
                 else
                 {
                     imageId = imageId.WithPrimary(_sceneryPrimaryColour);
-                    if (wallEntry->flags & WALL_SCENERY_HAS_SECONDARY_COLOUR)
+                    if (wallEntry->flags.has(WallSceneryFlag::hasSecondaryColour))
                     {
                         imageId = imageId.WithSecondary(_scenerySecondaryColour);
-                        if (wallEntry->flags & WALL_SCENERY_HAS_TERTIARY_COLOUR)
+                        if (wallEntry->flags.has(WallSceneryFlag::hasTertiaryColour))
                         {
                             imageId = imageId.WithTertiary(_sceneryTertiaryColour);
                         }
                     }
                     GfxDrawSprite(rt, imageId, { 47, spriteTop });
 
-                    if (wallEntry->flags & WALL_SCENERY_IS_DOOR)
+                    if (wallEntry->flags.has(WallSceneryFlag::isDoor))
                     {
                         GfxDrawSprite(rt, imageId.WithIndexOffset(1), { 47, spriteTop });
                     }
@@ -2261,7 +2264,7 @@ namespace OpenRCT2::Ui::Windows
                     auto* scenery_entry = info.Element->asWall()->GetEntry();
 
                     // If can't repaint
-                    if (!(scenery_entry->flags & (WALL_SCENERY_HAS_PRIMARY_COLOUR | WALL_SCENERY_HAS_GLASS)))
+                    if (!scenery_entry->flags.hasAny(WallSceneryFlag::hasPrimaryColour, WallSceneryFlag::hasGlass))
                         return;
 
                     auto repaintScenery = GameActions::WallSetColourAction(
@@ -2913,15 +2916,15 @@ namespace OpenRCT2::Ui::Windows
             {
                 switch (gWindowSceneryScatterDensity)
                 {
-                    case ScatterToolDensity::LowDensity:
+                    case ScatterToolDensity::lowDensity:
                         quantity = gWindowSceneryScatterSize;
                         break;
 
-                    case ScatterToolDensity::MediumDensity:
+                    case ScatterToolDensity::mediumDensity:
                         quantity = gWindowSceneryScatterSize * 2;
                         break;
 
-                    case ScatterToolDensity::HighDensity:
+                    case ScatterToolDensity::highDensity:
                         quantity = gWindowSceneryScatterSize * 3;
                         break;
                 }

@@ -12,15 +12,12 @@
 #include "../Cheats.h"
 #include "../Context.h"
 #include "../Diagnostic.h"
-#include "../Editor.h"
 #include "../Game.h"
 #include "../GameState.h"
 #include "../OpenRCT2.h"
 #include "../ParkImporter.h"
 #include "../Version.h"
-#include "../config/Config.h"
 #include "../core/Console.hpp"
-#include "../core/Crypt.h"
 #include "../core/DataSerialiser.h"
 #include "../core/File.h"
 #include "../core/OrcaStream.hpp"
@@ -37,7 +34,6 @@
 #include "../entity/Particle.h"
 #include "../entity/PatrolArea.h"
 #include "../entity/Staff.h"
-#include "../interface/Viewport.h"
 #include "../localisation/Formatter.h"
 #include "../management/Award.h"
 #include "../management/Finance.h"
@@ -46,9 +42,7 @@
 #include "../object/ObjectManager.h"
 #include "../object/ObjectRepository.h"
 #include "../peep/RideUseSystem.h"
-#include "../rct2/RCT2.h"
 #include "../ride/RideManager.hpp"
-#include "../ride/ShopItem.h"
 #include "../ride/Track.h"
 #include "../ride/Vehicle.h"
 #include "../scenario/Scenario.h"
@@ -57,8 +51,8 @@
 #include "../ui/WindowManager.h"
 #include "../world/Entrance.h"
 #include "../world/Map.h"
-#include "../world/Park.h"
 #include "../world/Scenery.h"
+#include "../world/TileElementsView.h"
 #include "../world/Weather.h"
 #include "../world/tile_element/PathElement.h"
 #include "../world/tile_element/SmallSceneryElement.h"
@@ -69,7 +63,6 @@
 #include <cassert>
 #include <cstdint>
 #include <ctime>
-#include <numeric>
 #include <optional>
 #include <string_view>
 #include <vector>
@@ -241,7 +234,7 @@ namespace OpenRCT2
                 entry.ObjectiveArg3 = cs.read<uint16_t>();
                 entry.ObjectiveArg2 = cs.read<int32_t>();
 
-                entry.SourceGame = ScenarioSource::Other;
+                entry.SourceGame = ScenarioSource::other;
             });
             return entry;
         }
@@ -462,7 +455,7 @@ namespace OpenRCT2
                         {
                             if (entry.HasValue())
                             {
-                                if (entry.Generation == ObjectGeneration::JSON)
+                                if (entry.Generation == ObjectGeneration::json)
                                 {
                                     cs.write(kDescriptorJson);
                                     cs.write(entry.Identifier);
@@ -804,7 +797,7 @@ namespace OpenRCT2
                             if (objRepository.FindObjectLegacy(legacyIdentifier) == nullptr)
                             {
                                 objRepository.AddObjectFromFile(
-                                    ObjectGeneration::DAT, legacyIdentifier, data.data(), data.size());
+                                    ObjectGeneration::dat, legacyIdentifier, data.data(), data.size());
                             }
                         }
                         else if (type == kDescriptorParkObj)
@@ -816,7 +809,7 @@ namespace OpenRCT2
                             cs.read(data.data(), data.size());
                             if (objRepository.FindObject(identifier) == nullptr)
                             {
-                                objRepository.AddObjectFromFile(ObjectGeneration::JSON, identifier, data.data(), data.size());
+                                objRepository.AddObjectFromFile(ObjectGeneration::json, identifier, data.data(), data.size());
                             }
                         }
                         else
@@ -1215,7 +1208,7 @@ namespace OpenRCT2
                     TileElementIteratorBegin(&it);
                     while (TileElementIteratorNext(&it))
                     {
-                        if (it.element->getType() == TileElementType::Path)
+                        if (it.element->getType() == TileElementType::path)
                         {
                             auto* pathElement = it.element->asPath();
                             if (pathElement->HasLegacyPathEntry())
@@ -1232,7 +1225,7 @@ namespace OpenRCT2
                                 }
                             }
                         }
-                        else if (it.element->getType() == TileElementType::Track)
+                        else if (it.element->getType() == TileElementType::track)
                         {
                             auto* trackElement = it.element->asTrack();
                             auto trackType = trackElement->GetTrackType();
@@ -1248,7 +1241,7 @@ namespace OpenRCT2
                                     trackElement->SetBrakeBoosterSpeed(kRCT2DefaultBlockBrakeSpeed);
                             }
                         }
-                        else if (it.element->getType() == TileElementType::SmallScenery && os.getHeader().targetVersion < 23)
+                        else if (it.element->getType() == TileElementType::smallScenery && os.getHeader().targetVersion < 23)
                         {
                             auto* sceneryElement = it.element->asSmallScenery();
                             // Previous formats stored the needs supports flag in the primary colour
@@ -1280,22 +1273,14 @@ namespace OpenRCT2
             {
                 for (int32_t x = 0; x < gameState.mapSize.x; x++)
                 {
-                    TileElement* tileElement = MapGetFirstElementAt(TileCoordsXY{ x, y });
-                    if (tileElement == nullptr)
-                        continue;
-                    do
+                    for (auto* trackElement : TileElementsView<TrackElement>(TileCoordsXY{ x, y }))
                     {
-                        if (tileElement->getType() != TileElementType::Track)
-                            continue;
-
-                        auto* trackElement = tileElement->asTrack();
                         const auto* ride = GetRide(trackElement->GetRideIndex());
                         if (ride != nullptr)
                         {
                             trackElement->SetRideType(ride->type);
                         }
-
-                    } while (!(tileElement++)->isLastForTile());
+                    }
                 }
             }
         }
@@ -2723,6 +2708,7 @@ namespace OpenRCT2
     void ParkFileExporter::Export(GameState_t& gameState, std::string_view path, int16_t compressionLevel)
     {
         auto parkFile = std::make_unique<ParkFile>();
+        parkFile->ExportObjectsList = ExportObjectsList;
         parkFile->Save(gameState, path, compressionLevel);
     }
 

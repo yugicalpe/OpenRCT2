@@ -10,7 +10,9 @@
 #pragma once
 
 #include "../core/Identifier.hpp"
-#include "../interface/Window.h"
+#include "../interface/WindowClasses.h"
+#include "../interface/WindowFlags.h"
+#include "../interface/WindowTypes.h"
 
 #include <map>
 #include <sfl/static_vector.hpp>
@@ -57,6 +59,7 @@ namespace OpenRCT2
         INTENT_ACTION_RESTORE_PROVISIONAL_ELEMENTS,
         INTENT_ACTION_REMOVE_PROVISIONAL_FOOTPATH,
         INTENT_ACTION_REMOVE_PROVISIONAL_TRACK_PIECE,
+        INTENT_ACTION_REFRESH_PLAYER_LIST,
 
         INTENT_ACTION_NULL = 255,
     };

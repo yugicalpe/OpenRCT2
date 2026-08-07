@@ -24,8 +24,10 @@
 #include <openrct2/actions/peep/PeepSpawnPlaceAction.h>
 #include <openrct2/actions/terraform/SurfaceSetStyleAction.h>
 #include <openrct2/audio/Audio.h>
+#include <openrct2/drawing/Drawing.Sprite.h>
 #include <openrct2/drawing/Drawing.String.h>
 #include <openrct2/drawing/Drawing.h>
+#include <openrct2/drawing/NewDrawing.h>
 #include <openrct2/drawing/Rectangle.h>
 #include <openrct2/drawing/Text.h>
 #include <openrct2/entity/EntityList.h>
@@ -238,10 +240,10 @@ namespace OpenRCT2::Ui::Windows
 
         enum class ResizeDirection
         {
-            Both,
-            X,
-            Y,
-        } _resizeDirection{ ResizeDirection::Both };
+            both,
+            x,
+            y,
+        } _resizeDirection{ ResizeDirection::both };
         uint16_t _flashingFlags = 0;
 
         u8string _xSpinnerCaption{};
@@ -347,19 +349,19 @@ namespace OpenRCT2::Ui::Windows
             switch (widgetIndex)
             {
                 case WIDX_MAP_SIZE_SPINNER_Y_UP:
-                    _resizeDirection = ResizeDirection::Y;
+                    _resizeDirection = ResizeDirection::y;
                     IncreaseMapSize();
                     break;
                 case WIDX_MAP_SIZE_SPINNER_Y_DOWN:
-                    _resizeDirection = ResizeDirection::Y;
+                    _resizeDirection = ResizeDirection::y;
                     DecreaseMapSize();
                     break;
                 case WIDX_MAP_SIZE_SPINNER_X_UP:
-                    _resizeDirection = ResizeDirection::X;
+                    _resizeDirection = ResizeDirection::x;
                     IncreaseMapSize();
                     break;
                 case WIDX_MAP_SIZE_SPINNER_X_DOWN:
-                    _resizeDirection = ResizeDirection::X;
+                    _resizeDirection = ResizeDirection::x;
                     DecreaseMapSize();
                     break;
             }
@@ -465,7 +467,7 @@ namespace OpenRCT2::Ui::Windows
                 return;
 
             int32_t mapZ = tileElement->getBaseZ();
-            if (tileElement->getType() == TileElementType::Surface)
+            if (tileElement->getType() == TileElementType::surface)
             {
                 if ((tileElement->asSurface()->GetSlope() & kTileSlopeRaisedCornersMask) != 0)
                     mapZ += 16;
@@ -521,9 +523,9 @@ namespace OpenRCT2::Ui::Windows
                             size, static_cast<int>(kMinimumMapSizeTechnical), static_cast<int>(kMaximumMapSizeTechnical));
 
                         TileCoordsXY newMapSize = getGameState().mapSize;
-                        if (_resizeDirection != ResizeDirection::X)
+                        if (_resizeDirection != ResizeDirection::x)
                             newMapSize.y = size;
-                        if (_resizeDirection != ResizeDirection::Y)
+                        if (_resizeDirection != ResizeDirection::y)
                             newMapSize.x = size;
 
                         auto mapChangeSizeAction = GameActions::MapChangeSizeAction(newMapSize);
@@ -650,7 +652,7 @@ namespace OpenRCT2::Ui::Windows
             // Disable all scenario editor related widgets
             for (int32_t i = WIDX_MAP_SIZE_SPINNER_Y; i <= WIDX_MAP_GENERATOR; i++)
             {
-                widgets[i].type = WidgetType::empty;
+                widgets[i].setHidden();
             }
 
             if (isEditorOrSandbox())
@@ -762,9 +764,9 @@ namespace OpenRCT2::Ui::Windows
         void IncreaseMapSize()
         {
             auto newMapSize = getGameState().mapSize;
-            if (isWidgetPressed(WIDX_MAP_SIZE_LINK) || _resizeDirection == ResizeDirection::Y)
+            if (isWidgetPressed(WIDX_MAP_SIZE_LINK) || _resizeDirection == ResizeDirection::y)
                 newMapSize.y++;
-            if (isWidgetPressed(WIDX_MAP_SIZE_LINK) || _resizeDirection == ResizeDirection::X)
+            if (isWidgetPressed(WIDX_MAP_SIZE_LINK) || _resizeDirection == ResizeDirection::x)
                 newMapSize.x++;
 
             auto increaseMapSizeAction = GameActions::MapChangeSizeAction(newMapSize);
@@ -774,9 +776,9 @@ namespace OpenRCT2::Ui::Windows
         void DecreaseMapSize()
         {
             auto newMapSize = getGameState().mapSize;
-            if (isWidgetPressed(WIDX_MAP_SIZE_LINK) || _resizeDirection == ResizeDirection::Y)
+            if (isWidgetPressed(WIDX_MAP_SIZE_LINK) || _resizeDirection == ResizeDirection::y)
                 newMapSize.y--;
-            if (isWidgetPressed(WIDX_MAP_SIZE_LINK) || _resizeDirection == ResizeDirection::X)
+            if (isWidgetPressed(WIDX_MAP_SIZE_LINK) || _resizeDirection == ResizeDirection::x)
                 newMapSize.x--;
 
             auto decreaseMapSizeAction = GameActions::MapChangeSizeAction(newMapSize);
@@ -877,7 +879,7 @@ namespace OpenRCT2::Ui::Windows
                 auto tileElementType = tileElement->getType();
                 if (EnumValue(tileElementType) >= maxSupportedTileElementType)
                 {
-                    tileElementType = TileElementType::Surface;
+                    tileElementType = TileElementType::surface;
                 }
                 const auto overwriteColours = kElementTypeOverwriteColour[EnumValue(tileElementType)];
                 if (overwriteColours.a != PaletteIndex::transparent)
@@ -913,17 +915,17 @@ namespace OpenRCT2::Ui::Windows
 
                 switch (tileElement->getType())
                 {
-                    case TileElementType::Surface:
+                    case TileElementType::surface:
                         if (tileElement->asSurface()->GetWaterHeight() > 0)
                             // Why is this a different water colour as above (195)?
                             colourB = ColourPair(PaletteIndex::pi194);
                         if (!(tileElement->asSurface()->GetOwnership() & OWNERSHIP_OWNED))
                             colourB = MapColourUnowned(colourB);
                         break;
-                    case TileElementType::Path:
+                    case TileElementType::path:
                         colourA = ColourPair(PaletteIndex::pi14); // lighter grey
                         break;
-                    case TileElementType::Entrance:
+                    case TileElementType::entrance:
                     {
                         if (tileElement->asEntrance()->GetEntranceType() == ENTRANCE_TYPE_PARK_ENTRANCE)
                             break;
@@ -935,7 +937,7 @@ namespace OpenRCT2::Ui::Windows
                         }
                         break;
                     }
-                    case TileElementType::Track:
+                    case TileElementType::track:
                     {
                         Ride* targetRide = GetRide(tileElement->asTrack()->GetRideIndex());
                         if (targetRide != nullptr)
@@ -1100,21 +1102,21 @@ namespace OpenRCT2::Ui::Windows
 
         void ShowDefaultScenarioEditorButtons()
         {
-            widgets[WIDX_SET_LAND_RIGHTS].type = WidgetType::flatBtn;
-            widgets[WIDX_BUILD_PARK_ENTRANCE].type = WidgetType::flatBtn;
-            widgets[WIDX_PEOPLE_STARTING_POSITION].type = WidgetType::flatBtn;
+            widgets[WIDX_SET_LAND_RIGHTS].setVisible();
+            widgets[WIDX_BUILD_PARK_ENTRANCE].setVisible();
+            widgets[WIDX_PEOPLE_STARTING_POSITION].setVisible();
 
             // only show this in the scenario editor, even when in sandbox mode.
             if (gLegacyScene == LegacyScene::scenarioEditor)
-                widgets[WIDX_MAP_GENERATOR].type = WidgetType::flatBtn;
+                widgets[WIDX_MAP_GENERATOR].setVisible();
 
-            widgets[WIDX_MAP_SIZE_SPINNER_Y].type = WidgetType::spinner;
-            widgets[WIDX_MAP_SIZE_SPINNER_Y_UP].type = WidgetType::button;
-            widgets[WIDX_MAP_SIZE_SPINNER_Y_DOWN].type = WidgetType::button;
-            widgets[WIDX_MAP_SIZE_LINK].type = WidgetType::flatBtn;
-            widgets[WIDX_MAP_SIZE_SPINNER_X].type = WidgetType::spinner;
-            widgets[WIDX_MAP_SIZE_SPINNER_X_UP].type = WidgetType::button;
-            widgets[WIDX_MAP_SIZE_SPINNER_X_DOWN].type = WidgetType::button;
+            widgets[WIDX_MAP_SIZE_SPINNER_Y].setVisible();
+            widgets[WIDX_MAP_SIZE_SPINNER_Y_UP].setVisible();
+            widgets[WIDX_MAP_SIZE_SPINNER_Y_DOWN].setVisible();
+            widgets[WIDX_MAP_SIZE_LINK].setVisible();
+            widgets[WIDX_MAP_SIZE_SPINNER_X].setVisible();
+            widgets[WIDX_MAP_SIZE_SPINNER_X_UP].setVisible();
+            widgets[WIDX_MAP_SIZE_SPINNER_X_DOWN].setVisible();
 
             // Push width (Y) and height (X) to the common formatter arguments for the map size spinners to use
             auto& gameState = getGameState();
@@ -1127,9 +1129,9 @@ namespace OpenRCT2::Ui::Windows
         void InputMapSize(WidgetIndex callingWidget)
         {
             if (isWidgetPressed(WIDX_MAP_SIZE_LINK))
-                _resizeDirection = ResizeDirection::Both;
+                _resizeDirection = ResizeDirection::both;
             else
-                _resizeDirection = (callingWidget == WIDX_MAP_SIZE_SPINNER_Y) ? ResizeDirection::Y : ResizeDirection::X;
+                _resizeDirection = (callingWidget == WIDX_MAP_SIZE_SPINNER_Y) ? ResizeDirection::y : ResizeDirection::x;
 
             Formatter ft;
             ft.Add<int16_t>(kMinimumMapSizePractical);

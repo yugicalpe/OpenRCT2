@@ -19,19 +19,21 @@
 #include "../core/Guard.hpp"
 #include "../object/ObjectEntryManager.h"
 #include "../object/WaterEntry.h"
-#include "../platform/Platform.h"
 #include "../util/Util.h"
 #include "../world/Location.hpp"
 #include "../world/Weather.h"
+#include "Drawing.Sprite.h"
+#include "FilterPaletteIds.h"
 #include "Font.h"
 #include "LightFX.h"
+#include "NewDrawing.h"
 #include "Rectangle.h"
+#include "RenderTarget.h"
 #include "Text.h"
 
 #include <array>
 #include <cassert>
 #include <cstring>
-#include <numeric>
 
 using namespace OpenRCT2;
 using namespace OpenRCT2::Drawing;
@@ -100,6 +102,7 @@ uint32_t gPaletteEffectFrame;
 ImageId gPickupPeepImage;
 int32_t gPickupPeepX;
 int32_t gPickupPeepY;
+ZoomLevel gPickupPeepZoom;
 
 bool gPaintForceRedraw{ false };
 
@@ -454,53 +457,25 @@ ImageCatalogue ImageId::GetCatalogue() const
     auto index = GetIndex();
     if (index >= SPR_TEMP_BEGIN && index < SPR_TEMP_END)
     {
-        return ImageCatalogue::TEMPORARY;
+        return ImageCatalogue::temporary;
     }
     if (index < SPR_RCTC_G1_END)
     {
-        return ImageCatalogue::G1;
+        return ImageCatalogue::g1;
     }
     if (index < SPR_G2_END)
     {
-        return ImageCatalogue::G2;
+        return ImageCatalogue::g2;
     }
     if (index < SPR_CSG_END)
     {
-        return ImageCatalogue::CSG;
+        return ImageCatalogue::csg;
     }
     if (index < SPR_IMAGE_LIST_END)
     {
-        return ImageCatalogue::OBJECT;
+        return ImageCatalogue::object;
     }
-    return ImageCatalogue::UNKNOWN;
-}
-
-static auto GetMaskFunction()
-{
-    if (Platform::AVX2Available())
-    {
-        LOG_VERBOSE("registering AVX2 mask function");
-        return MaskAvx2;
-    }
-    else if (Platform::SSE41Available())
-    {
-        LOG_VERBOSE("registering SSE4.1 mask function");
-        return MaskSse4_1;
-    }
-    else
-    {
-        LOG_VERBOSE("registering scalar mask function");
-        return MaskScalar;
-    }
-}
-
-static const auto MaskFunc = GetMaskFunction();
-
-void MaskFn(
-    int32_t width, int32_t height, const uint8_t* RESTRICT maskSrc, const uint8_t* RESTRICT colourSrc,
-    PaletteIndex* RESTRICT dst, int32_t maskWrap, int32_t colourWrap, int32_t dstWrap)
-{
-    MaskFunc(width, height, maskSrc, colourSrc, dst, maskWrap, colourWrap, dstWrap);
+    return ImageCatalogue::unknown;
 }
 
 void GfxFilterPixel(RenderTarget& rt, const ScreenCoordsXY& coords, FilterPaletteID palette)
@@ -645,29 +620,49 @@ bool ClipRenderTarget(RenderTarget& dst, RenderTarget& src, const ScreenCoordsXY
     return false;
 }
 
+constexpr std::array<int8_t, 3> kPickedUpPeepYOffsets = { 0, 16, 48 };
+
 void GfxInvalidatePickedUpPeep()
 {
-    auto imageId = gPickupPeepImage;
-    if (imageId.HasValue())
-    {
-        auto* g1 = GfxGetG1Element(imageId);
-        if (g1 != nullptr)
-        {
-            int32_t left = gPickupPeepX + g1->xOffset;
-            int32_t top = gPickupPeepY + g1->yOffset;
-            int32_t right = left + g1->width;
-            int32_t bottom = top + g1->height;
-            GfxSetDirtyBlocks({ { left, top }, { right, bottom } });
-        }
-    }
+    if (!gPickupPeepImage.HasValue())
+        return;
+
+    auto* g1 = GfxGetG1Element(gPickupPeepImage);
+    if (g1 == nullptr)
+        return;
+
+    auto zoom = gPickupPeepZoom;
+    auto xOffset = -int8_t(gPickupPeepZoom);
+    auto yOffset = kPickedUpPeepYOffsets[xOffset];
+
+    int32_t left = gPickupPeepX + zoom.ApplyInversedTo(g1->xOffset) + xOffset;
+    int32_t top = gPickupPeepY + zoom.ApplyInversedTo(g1->yOffset) + yOffset;
+    int32_t right = left + zoom.ApplyInversedTo(g1->width);
+    int32_t bottom = top + zoom.ApplyInversedTo(g1->height);
+
+    GfxSetDirtyBlocks({ { left, top }, { right, bottom } });
 }
 
 void GfxDrawPickedUpPeep(RenderTarget& rt)
 {
-    if (gPickupPeepImage.HasValue())
-    {
-        GfxDrawSprite(rt, gPickupPeepImage, { gPickupPeepX, gPickupPeepY });
-    }
+    if (!gPickupPeepImage.HasValue())
+        return;
+
+    assert(rt.zoom_level == ZoomLevel{ 0 });
+
+    auto zoom = gPickupPeepZoom;
+    auto xOffset = -int8_t(gPickupPeepZoom);
+    auto yOffset = kPickedUpPeepYOffsets[xOffset];
+
+    auto pos = ScreenCoordsXY{ zoom.ApplyTo(gPickupPeepX + xOffset), zoom.ApplyTo(gPickupPeepY + yOffset) };
+
+    rt.zoom_level = zoom;
+    rt.pitch = zoom.ApplyTo(rt.pitch);
+
+    GfxDrawSprite(rt, gPickupPeepImage, pos);
+
+    rt.pitch = zoom.ApplyInversedTo(rt.pitch);
+    rt.zoom_level = ZoomLevel{ 0 };
 }
 
 std::optional<uint32_t> GetPaletteG1Index(FilterPaletteID paletteId)

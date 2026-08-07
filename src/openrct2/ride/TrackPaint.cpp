@@ -10,11 +10,8 @@
 #include "TrackPaint.h"
 
 #include "../Diagnostic.h"
-#include "../Game.h"
 #include "../GameState.h"
 #include "../SpriteIds.h"
-#include "../config/Config.h"
-#include "../drawing/Drawing.h"
 #include "../drawing/LightFX.h"
 #include "../interface/Viewport.h"
 #include "../object/StationObject.h"
@@ -22,7 +19,6 @@
 #include "../paint/Paint.SessionFlags.h"
 #include "../paint/Paint.h"
 #include "../paint/support/MetalSupports.h"
-#include "../paint/support/WoodenSupports.h"
 #include "../paint/tile_element/Paint.TileElement.h"
 #include "../paint/tile_element/Paint.Track.h"
 #include "../paint/tile_element/Segment.h"
@@ -30,7 +26,6 @@
 #include "../paint/track/Support.h"
 #include "../world/tile_element/TrackElement.h"
 #include "RideData.h"
-#include "Station.h"
 #include "TrackData.h"
 #include "TrackDesign.h"
 #include "TrackStyle.h"
@@ -2042,7 +2037,7 @@ void TrackPaintUtilOnridePhotoPaint2(
     int32_t supportsAboveHeightOffset, int32_t trackHeightOffset)
 {
     TrackPaintUtilOnridePhotoPaint(session, direction, height + trackHeightOffset, trackElement);
-    PaintUtilPushTunnelRotated(session, direction, height, TunnelGroup::Square, TunnelSubType::Flat);
+    PaintUtilPushTunnelRotated(session, direction, height, TunnelGroup::square, TunnelSubType::flat);
     PaintUtilSetSegmentSupportHeight(session, kSegmentsAll, 0xFFFF, 0);
     PaintUtilSetGeneralSupportHeight(session, height + supportsAboveHeightOffset);
 }

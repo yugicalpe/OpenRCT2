@@ -13,12 +13,9 @@
 #include "../entity/Guest.h"
 #include "../network/Network.h"
 #include "../network/NetworkTypes.h"
-#include "../object/Object.h"
-#include "../ride/RideColour.h"
 #include "../ride/TrackDesign.h"
 #include "../world/Banner.h"
 #include "../world/Footpath.h"
-#include "../world/Location.hpp"
 #include "../world/tile_element/TileElement.h"
 #include "DataSerialiserTag.h"
 #include "Endianness.h"
@@ -643,7 +640,7 @@ namespace OpenRCT2
         static void encode(IStream* stream, const ObjectEntryDescriptor& val)
         {
             stream->WriteValue<uint8_t>(static_cast<uint8_t>(val.Generation));
-            if (val.Generation == ObjectGeneration::DAT)
+            if (val.Generation == ObjectGeneration::dat)
             {
                 DataSerializerTraits<RCTObjectEntry> s;
                 s.encode(stream, val.Entry);
@@ -658,7 +655,7 @@ namespace OpenRCT2
         static void decode(IStream* stream, ObjectEntryDescriptor& val)
         {
             auto generation = static_cast<ObjectGeneration>(stream->ReadValue<uint8_t>());
-            if (generation == ObjectGeneration::DAT)
+            if (generation == ObjectGeneration::dat)
             {
                 DataSerializerTraits<RCTObjectEntry> s;
                 RCTObjectEntry entry;

@@ -31,7 +31,7 @@ using namespace OpenRCT2;
 using namespace OpenRCT2::RideVehicle;
 using namespace OpenRCT2::TrackMetadata;
 
-void RideUpdateMeasurementsSpecialElements_MiniGolf(Ride& ride, const TrackElemType trackType)
+void OpenRCT2::RideUpdateMeasurementsSpecialElements_MiniGolf(Ride& ride, const TrackElemType trackType)
 {
     const auto& ted = GetTrackElementDescriptor(trackType);
     if (ted.flags.has(TrackElementFlag::isGolfHole))
@@ -276,7 +276,7 @@ void RideUpdateMeasurementsSpecialElements_MiniGolf(Ride& ride, const TrackElemT
                 {
                     TrackSubposition = prevVehicle->TrackSubposition;
                 }
-                if (TrackSubposition != VehicleTrackSubposition::MiniGolfStart9)
+                if (TrackSubposition != VehicleTrackSubposition::miniGolfStart9)
                 {
                     TrackSubposition = VehicleTrackSubposition{ static_cast<uint8_t>(
                         static_cast<uint8_t>(TrackSubposition) - 1u) };
@@ -312,7 +312,7 @@ void RideUpdateMeasurementsSpecialElements_MiniGolf(Ride& ride, const TrackElemT
             }
             switch (MiniGolfState(moveInfo->y))
             {
-                case MiniGolfState::Unk0: // Loc6DC7B4
+                case MiniGolfState::unk0: // Loc6DC7B4
                     if (!IsHead())
                     {
                         miniGolfFlags.set(MiniGolfFlag::flag3);
@@ -320,34 +320,34 @@ void RideUpdateMeasurementsSpecialElements_MiniGolf(Ride& ride, const TrackElemT
                     else
                     {
                         uint16_t rand16 = ScenarioRand() & 0xFFFF;
-                        VehicleTrackSubposition nextTrackSubposition = VehicleTrackSubposition::MiniGolfBallPathC14;
+                        VehicleTrackSubposition nextTrackSubposition = VehicleTrackSubposition::miniGolfBallPathC14;
                         if (rand16 <= 0xA000)
                         {
-                            nextTrackSubposition = VehicleTrackSubposition::MiniGolfBallPathB12;
+                            nextTrackSubposition = VehicleTrackSubposition::miniGolfBallPathB12;
                             if (rand16 <= 0x900)
                             {
-                                nextTrackSubposition = VehicleTrackSubposition::MiniGolfBallPathA10;
+                                nextTrackSubposition = VehicleTrackSubposition::miniGolfBallPathA10;
                             }
                         }
                         TrackSubposition = nextTrackSubposition;
                     }
                     track_progress++;
                     break;
-                case MiniGolfState::Unk1: // Loc6DC7ED
+                case MiniGolfState::unk1: // Loc6DC7ED
                     LOG_ERROR("Unused move info...");
                     assert(false);
                     var_D3 = static_cast<uint8_t>(moveInfo->z);
                     track_progress++;
                     break;
-                case MiniGolfState::Unk2: // Loc6DC800
+                case MiniGolfState::unk2: // Loc6DC800
                     miniGolfFlags.set(MiniGolfFlag::flag0);
                     track_progress++;
                     break;
-                case MiniGolfState::Unk3: // Loc6DC810
+                case MiniGolfState::unk3: // Loc6DC810
                     miniGolfFlags.set(MiniGolfFlag::flag1);
                     track_progress++;
                     break;
-                case MiniGolfState::Unk4: // Loc6DC820
+                case MiniGolfState::unk4: // Loc6DC820
                 {
                     auto animation = MiniGolfAnimation(moveInfo->z);
                     // When the ride is closed occasionally the peep is removed
@@ -356,18 +356,18 @@ void RideUpdateMeasurementsSpecialElements_MiniGolf(Ride& ride, const TrackElemT
                     auto* curPeep = getGameState().entities.TryGetEntity<Guest>(peep[0]);
                     if (curPeep != nullptr)
                     {
-                        if (animation == MiniGolfAnimation::SwingLeft)
+                        if (animation == MiniGolfAnimation::swingLeft)
                         {
                             if (curPeep->PeepId & 7)
                             {
-                                animation = MiniGolfAnimation::Swing;
+                                animation = MiniGolfAnimation::swing;
                             }
                         }
-                        if (animation == MiniGolfAnimation::PuttLeft)
+                        if (animation == MiniGolfAnimation::puttLeft)
                         {
                             if (curPeep->PeepId & 7)
                             {
-                                animation = MiniGolfAnimation::Putt;
+                                animation = MiniGolfAnimation::putt;
                             }
                         }
                     }
@@ -376,11 +376,11 @@ void RideUpdateMeasurementsSpecialElements_MiniGolf(Ride& ride, const TrackElemT
                     track_progress++;
                     break;
                 }
-                case MiniGolfState::Unk5: // Loc6DC87A
+                case MiniGolfState::unk5: // Loc6DC87A
                     miniGolfFlags.set(MiniGolfFlag::flag2);
                     track_progress++;
                     break;
-                case MiniGolfState::Unk6: // Loc6DC88A
+                case MiniGolfState::unk6: // Loc6DC88A
                     miniGolfFlags.unset(MiniGolfFlag::flag4);
                     miniGolfFlags.set(MiniGolfFlag::flag5);
                     track_progress++;
@@ -589,7 +589,7 @@ void Vehicle::Loc6DCDE4(const Ride& curRide)
 void Vehicle::Loc6DCE02(const Ride& curRide)
 {
     acceleration /= _vehicleUnkF64E10;
-    if (TrackSubposition == VehicleTrackSubposition::ChairliftGoingBack)
+    if (TrackSubposition == VehicleTrackSubposition::chairliftGoingBack)
     {
         return;
     }

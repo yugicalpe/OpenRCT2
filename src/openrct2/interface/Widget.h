@@ -166,9 +166,24 @@ namespace OpenRCT2
             moveDown(y - top);
         }
 
+        bool isHidden() const
+        {
+            return flags.has(WidgetFlag::isHidden);
+        }
+
         bool isVisible() const
         {
-            return !flags.has(WidgetFlag::isHidden);
+            return !isHidden();
+        }
+
+        void setHidden(bool state = true)
+        {
+            flags.set(WidgetFlag::isHidden, state);
+        }
+
+        void setVisible(bool state = true)
+        {
+            setHidden(!state);
         }
 
         void setString(StringId newStringId)
@@ -206,8 +221,8 @@ namespace OpenRCT2
     constexpr uint8_t kListRowHeight = 12;
     constexpr uint8_t kTableCellHeight = 12;
     constexpr uint8_t kButtonFaceHeight = 12;
-    constexpr uint8_t kSpinnerHeight = 12;
-    constexpr uint8_t kDropdownHeight = 12;
+    constexpr uint8_t kSpinnerHeight = 14;
+    constexpr uint8_t kDropdownHeight = 14;
 
     constexpr uint16_t kTextInputSize = 1024;
     constexpr uint16_t kTopToolbarHeight = 27;

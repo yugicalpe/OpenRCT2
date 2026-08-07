@@ -9,9 +9,7 @@
 
 #pragma once
 
-#include "../core/BitSet.hpp"
 #include "../management/Finance.h"
-#include "../ride/Ride.h"
 #include "../ride/ShopItem.h"
 #include "Peep.h"
 
@@ -19,6 +17,8 @@ struct CarEntry;
 
 namespace OpenRCT2
 {
+    struct Vehicle;
+
     constexpr int8_t kPeepMaxThoughts = 5;
 
     constexpr int8_t kPeepHungerWarningThreshold = 25;
@@ -205,9 +205,6 @@ namespace OpenRCT2
         uint8_t freshness;     // larger is less fresh
         uint8_t fresh_timeout; // updates every tick
     };
-
-    struct Guest;
-    struct Staff;
 
     struct IntensityRange
     {

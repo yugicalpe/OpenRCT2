@@ -13,7 +13,6 @@
 #include <functional>
 #include <openrct2-ui/UiStringIds.h>
 #include <openrct2-ui/windows/Windows.h>
-#include <openrct2/Editor.h>
 #include <openrct2/Game.h>
 #include <openrct2/GameState.h>
 #include <openrct2/PlatformEnvironment.h>
@@ -21,7 +20,7 @@
 #include <openrct2/core/Path.hpp>
 #include <openrct2/core/String.hpp>
 #include <openrct2/drawing/Drawing.h>
-#include <openrct2/interface/Window.h>
+#include <openrct2/interface/WindowTypes.h>
 #include <openrct2/localisation/Formatter.h>
 #include <openrct2/localisation/StringIds.h>
 #include <openrct2/platform/Platform.h>
@@ -29,14 +28,15 @@
 #include <openrct2/ride/TrackDesign.h>
 #include <openrct2/scenario/Scenario.h>
 #include <openrct2/scenes/SceneManager.h>
+#include <openrct2/scenes/editor/EditorScene.h>
 #include <openrct2/ui/UiContext.h>
 #include <openrct2/ui/WindowManager.h>
 #include <openrct2/windows/Intent.h>
 
 #ifdef __EMSCRIPTEN__
 extern "C" {
-extern void EmscriptenLoadGame(LoadSaveType type);
-extern void EmscriptenSaveGame(bool isTrackDesign, bool isAutosave, LoadSaveType type);
+extern void EmscriptenLoadGame(OpenRCT2::LoadSaveType type);
+extern void EmscriptenSaveGame(bool isTrackDesign, bool isAutosave, OpenRCT2::LoadSaveType type);
 }
 #endif
 
@@ -303,7 +303,11 @@ namespace OpenRCT2::Ui::FileBrowser
                     case (LoadSaveType::landscape):
                     {
                         SetAndSaveConfigPath(Config::Get().general.lastSaveLandscapeDirectory, pathBuffer);
-                        if (Editor::LoadLandscape(pathBuffer))
+
+                        auto* sceneMgr = GetContext()->GetSceneManager();
+                        auto* editorScene = static_cast<EditorScene*>(sceneMgr->getScenarioEditorScene());
+                        sceneMgr->setActiveScene(editorScene);
+                        if (editorScene->LoadLandscape(pathBuffer))
                         {
                             gCurrentLoadedPath = pathBuffer;
                             GfxInvalidateScreen();
@@ -541,7 +545,7 @@ namespace OpenRCT2::Ui::FileBrowser
         StringId title = GetTitleStringId(type, isSave);
 
         FileDialogDesc desc = {
-            .Type = isSave ? FileDialogType::Save : FileDialogType::Open,
+            .Type = isSave ? FileDialogType::save : FileDialogType::open,
             .Title = LanguageGetString(title),
             .InitialDirectory = defaultDirectory,
             .DefaultFilename = isSave ? path : u8string(),
@@ -553,8 +557,8 @@ namespace OpenRCT2::Ui::FileBrowser
 } // namespace OpenRCT2::Ui::FileBrowser
 
 #ifdef __EMSCRIPTEN__
-extern "C" void LoadGameCallback(const char* path, LoadSaveType action)
+extern "C" void LoadGameCallback(const char* path, OpenRCT2::LoadSaveType action)
 {
-    OpenRCT2::Ui::FileBrowser::Select(path, LoadSaveAction::load, action, nullptr);
+    OpenRCT2::Ui::FileBrowser::Select(path, OpenRCT2::LoadSaveAction::load, action, nullptr);
 }
 #endif

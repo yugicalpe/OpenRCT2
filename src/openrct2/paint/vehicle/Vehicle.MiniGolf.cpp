@@ -13,7 +13,6 @@
 #include "../../entity/EntityRegistry.h"
 #include "../../entity/Guest.h"
 #include "../../ride/Ride.h"
-#include "../../ride/TrackPaint.h"
 #include "../../ride/Vehicle.h"
 #include "../Paint.h"
 #include "VehiclePaint.h"
@@ -136,7 +135,7 @@ namespace OpenRCT2
     void VehicleVisualMiniGolfBall(
         PaintSession& session, int32_t x, int32_t imageDirection, int32_t y, int32_t z, const Vehicle* vehicle)
     {
-        if (vehicle->mini_golf_current_animation != MiniGolfAnimation::PlaceBallDown)
+        if (vehicle->mini_golf_current_animation != MiniGolfAnimation::placeBallDown)
         {
             return;
         }

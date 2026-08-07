@@ -63,31 +63,31 @@ namespace OpenRCT2::Ui::Windows
     // clang-format off
     static constexpr auto window_land_rights_widgets = makeWidgets(
         makeWindowShim(kWindowTitle, kWindowSize),
-        makeWidget     ({ 27, 17}, { 44, 32}, WidgetType::imgBtn, WindowColour::primary, ImageId(SPR_LAND_TOOL_SIZE_0)                                                   ), // preview box
-        makeRemapWidget({ 28, 18}, { 16, 16}, WidgetType::trnBtn, WindowColour::primary, SPR_LAND_TOOL_DECREASE,          STR_ADJUST_SMALLER_LAND_RIGHTS_TIP             ), // decrement size
-        makeRemapWidget({ 54, 32}, { 16, 16}, WidgetType::trnBtn, WindowColour::primary, SPR_LAND_TOOL_INCREASE,          STR_ADJUST_LARGER_LAND_RIGHTS_TIP              ), // increment size
-        makeRemapWidget({ 22, 53}, { 24, 24}, WidgetType::imgBtn, WindowColour::primary, SPR_BUY_LAND_RIGHTS,             STR_BUY_LAND_RIGHTS_TIP                        ), // land rights
-        makeRemapWidget({ 52, 53}, { 24, 24}, WidgetType::imgBtn, WindowColour::primary, SPR_BUY_CONSTRUCTION_RIGHTS,     STR_BUY_CONSTRUCTION_RIGHTS_TIP                ), // construction rights
-        makeWidget     ({100, 22}, {170, 12}, WidgetType::empty,  WindowColour::primary, STR_LAND_OWNED,                  STR_SET_LAND_TO_BE_OWNED_TIP                   ),
-        makeWidget     ({100, 38}, {170, 12}, WidgetType::empty,  WindowColour::primary, STR_LAND_SALE,                   STR_SET_LAND_TO_BE_AVAILABLE_TIP               ),
-        makeWidget     ({100, 54}, {170, 12}, WidgetType::empty,  WindowColour::primary, STR_CONSTRUCTION_RIGHTS_OWNED,   STR_SET_CONSTRUCTION_RIGHTS_TO_BE_OWNED_TIP    ),
-        makeWidget     ({100, 70}, {170, 12}, WidgetType::empty,  WindowColour::primary, STR_CONSTRUCTION_RIGHTS_SALE,    STR_SET_CONSTRUCTION_RIGHTS_TO_BE_AVAILABLE_TIP),
-        makeWidget     ({100, 86}, {170, 12}, WidgetType::empty,  WindowColour::primary, STR_LAND_NOT_OWNED,              STR_SET_LAND_TO_BE_NOT_OWNED_TIP               )
+        makeWidget     ({ 27, 17}, { 44, 32}, WidgetType::imgBtn,   WindowColour::primary, ImageId(SPR_LAND_TOOL_SIZE_0)                                                   ), // preview box
+        makeRemapWidget({ 28, 18}, { 16, 16}, WidgetType::trnBtn,   WindowColour::primary, SPR_LAND_TOOL_DECREASE,          STR_ADJUST_SMALLER_LAND_RIGHTS_TIP             ), // decrement size
+        makeRemapWidget({ 54, 32}, { 16, 16}, WidgetType::trnBtn,   WindowColour::primary, SPR_LAND_TOOL_INCREASE,          STR_ADJUST_LARGER_LAND_RIGHTS_TIP              ), // increment size
+        makeRemapWidget({ 22, 53}, { 24, 24}, WidgetType::imgBtn,   WindowColour::primary, SPR_BUY_LAND_RIGHTS,             STR_BUY_LAND_RIGHTS_TIP                        ), // land rights
+        makeRemapWidget({ 52, 53}, { 24, 24}, WidgetType::imgBtn,   WindowColour::primary, SPR_BUY_CONSTRUCTION_RIGHTS,     STR_BUY_CONSTRUCTION_RIGHTS_TIP                ), // construction rights
+        makeWidget     ({100, 22}, {170, 12}, WidgetType::checkbox, WindowColour::primary, STR_LAND_OWNED,                  STR_SET_LAND_TO_BE_OWNED_TIP                   ),
+        makeWidget     ({100, 38}, {170, 12}, WidgetType::checkbox, WindowColour::primary, STR_LAND_SALE,                   STR_SET_LAND_TO_BE_AVAILABLE_TIP               ),
+        makeWidget     ({100, 54}, {170, 12}, WidgetType::checkbox, WindowColour::primary, STR_CONSTRUCTION_RIGHTS_OWNED,   STR_SET_CONSTRUCTION_RIGHTS_TO_BE_OWNED_TIP    ),
+        makeWidget     ({100, 70}, {170, 12}, WidgetType::checkbox, WindowColour::primary, STR_CONSTRUCTION_RIGHTS_SALE,    STR_SET_CONSTRUCTION_RIGHTS_TO_BE_AVAILABLE_TIP),
+        makeWidget     ({100, 86}, {170, 12}, WidgetType::checkbox, WindowColour::primary, STR_LAND_NOT_OWNED,              STR_SET_LAND_TO_BE_NOT_OWNED_TIP               )
     );
     // clang-format on
 
     enum class LandRightsMode : uint8_t
     {
         // In-game
-        BuyLand,
-        BuyConstructionRights,
+        buyLand,
+        buyConstructionRights,
 
         // Sandbox/editor mode
-        SetLandOwned,
-        SetLandForSale,
-        SetConstructionRightsOwned,
-        SetConstructionRightsForSale,
-        SetLandUnowned,
+        setLandOwned,
+        setLandForSale,
+        setConstructionRightsOwned,
+        setConstructionRightsForSale,
+        setLandUnowned,
     };
 
     static const bool kLandRightsVisibleByMode[] = { true, false, true, true, false, false, true };
@@ -144,13 +144,13 @@ namespace OpenRCT2::Ui::Windows
             if (!IsOwnershipMode())
             {
                 if (gLandRemainingOwnershipSales > 0)
-                    SwitchToMode(LandRightsMode::BuyLand);
+                    SwitchToMode(LandRightsMode::buyLand);
                 else
-                    SwitchToMode(LandRightsMode::BuyConstructionRights);
+                    SwitchToMode(LandRightsMode::buyConstructionRights);
             }
             else
             {
-                SwitchToMode(LandRightsMode::SetLandOwned);
+                SwitchToMode(LandRightsMode::setLandOwned);
             }
         }
 
@@ -176,38 +176,38 @@ namespace OpenRCT2::Ui::Windows
 
                 // In-game mode widgets
                 case WIDX_BUY_LAND_RIGHTS:
-                    if (_landRightsMode != LandRightsMode::BuyLand)
-                        SwitchToMode(LandRightsMode::BuyLand);
+                    if (_landRightsMode != LandRightsMode::buyLand)
+                        SwitchToMode(LandRightsMode::buyLand);
                     break;
                 case WIDX_BUY_CONSTRUCTION_RIGHTS:
-                    if (_landRightsMode != LandRightsMode::BuyConstructionRights)
-                        SwitchToMode(LandRightsMode::BuyConstructionRights);
+                    if (_landRightsMode != LandRightsMode::buyConstructionRights)
+                        SwitchToMode(LandRightsMode::buyConstructionRights);
                     break;
 
                 // Sandbox/editor mode widgets
                 case WIDX_UNOWNED_LAND_CHECKBOX:
-                    if (_landRightsMode != LandRightsMode::SetLandUnowned)
-                        SwitchToMode(LandRightsMode::SetLandUnowned);
+                    if (_landRightsMode != LandRightsMode::setLandUnowned)
+                        SwitchToMode(LandRightsMode::setLandUnowned);
                     break;
 
                 case WIDX_LAND_SALE_CHECKBOX:
-                    if (_landRightsMode != LandRightsMode::SetLandForSale)
-                        SwitchToMode(LandRightsMode::SetLandForSale);
+                    if (_landRightsMode != LandRightsMode::setLandForSale)
+                        SwitchToMode(LandRightsMode::setLandForSale);
                     break;
 
                 case WIDX_LAND_OWNED_CHECKBOX:
-                    if (_landRightsMode != LandRightsMode::SetLandOwned)
-                        SwitchToMode(LandRightsMode::SetLandOwned);
+                    if (_landRightsMode != LandRightsMode::setLandOwned)
+                        SwitchToMode(LandRightsMode::setLandOwned);
                     break;
 
                 case WIDX_CONSTRUCTION_RIGHTS_SALE_CHECKBOX:
-                    if (_landRightsMode != LandRightsMode::SetConstructionRightsForSale)
-                        SwitchToMode(LandRightsMode::SetConstructionRightsForSale);
+                    if (_landRightsMode != LandRightsMode::setConstructionRightsForSale)
+                        SwitchToMode(LandRightsMode::setConstructionRightsForSale);
                     break;
 
                 case WIDX_CONSTRUCTION_RIGHTS_OWNED_CHECKBOX:
-                    if (_landRightsMode != LandRightsMode::SetConstructionRightsOwned)
-                        SwitchToMode(LandRightsMode::SetConstructionRightsOwned);
+                    if (_landRightsMode != LandRightsMode::setConstructionRightsOwned)
+                        SwitchToMode(LandRightsMode::setConstructionRightsOwned);
                     break;
             }
         }
@@ -264,28 +264,28 @@ namespace OpenRCT2::Ui::Windows
                 return;
             }
 
-            bool inRightsMode = _landRightsMode == LandRightsMode::BuyLand
-                || _landRightsMode == LandRightsMode::BuyConstructionRights;
+            bool inRightsMode = _landRightsMode == LandRightsMode::buyLand
+                || _landRightsMode == LandRightsMode::buyConstructionRights;
 
             if (!IsOwnershipMode() && !inRightsMode)
             {
                 if (gLandRemainingOwnershipSales > 0)
-                    SwitchToMode(LandRightsMode::BuyLand);
+                    SwitchToMode(LandRightsMode::buyLand);
                 else
-                    SwitchToMode(LandRightsMode::BuyConstructionRights);
+                    SwitchToMode(LandRightsMode::buyConstructionRights);
             }
             else if (IsOwnershipMode() && inRightsMode)
-                SwitchToMode(LandRightsMode::SetLandUnowned);
+                SwitchToMode(LandRightsMode::setLandUnowned);
         }
 
         void PrepareDrawInGame()
         {
-            if (_landRightsMode == LandRightsMode::BuyLand)
+            if (_landRightsMode == LandRightsMode::buyLand)
             {
                 setWidgetPressed(WIDX_BUY_LAND_RIGHTS, true);
                 setWidgetPressed(WIDX_BUY_CONSTRUCTION_RIGHTS, false);
             }
-            else if (_landRightsMode == LandRightsMode::BuyConstructionRights)
+            else if (_landRightsMode == LandRightsMode::buyConstructionRights)
             {
                 setWidgetPressed(WIDX_BUY_LAND_RIGHTS, false);
                 setWidgetPressed(WIDX_BUY_CONSTRUCTION_RIGHTS, true);
@@ -323,15 +323,15 @@ namespace OpenRCT2::Ui::Windows
             widgets[WIDX_INCREMENT].bottom = widgets[WIDX_INCREMENT].top + 16;
 
             // Show in-game mode widgets
-            widgets[WIDX_BUY_LAND_RIGHTS].type = WidgetType::imgBtn;
-            widgets[WIDX_BUY_CONSTRUCTION_RIGHTS].type = WidgetType::imgBtn;
+            widgets[WIDX_BUY_LAND_RIGHTS].setVisible();
+            widgets[WIDX_BUY_CONSTRUCTION_RIGHTS].setVisible();
 
             // Hide editor/sandbox mode widgets
-            widgets[WIDX_UNOWNED_LAND_CHECKBOX].type = WidgetType::empty;
-            widgets[WIDX_LAND_OWNED_CHECKBOX].type = WidgetType::empty;
-            widgets[WIDX_CONSTRUCTION_RIGHTS_OWNED_CHECKBOX].type = WidgetType::empty;
-            widgets[WIDX_LAND_SALE_CHECKBOX].type = WidgetType::empty;
-            widgets[WIDX_CONSTRUCTION_RIGHTS_SALE_CHECKBOX].type = WidgetType::empty;
+            widgets[WIDX_UNOWNED_LAND_CHECKBOX].setHidden();
+            widgets[WIDX_LAND_OWNED_CHECKBOX].setHidden();
+            widgets[WIDX_CONSTRUCTION_RIGHTS_OWNED_CHECKBOX].setHidden();
+            widgets[WIDX_LAND_SALE_CHECKBOX].setHidden();
+            widgets[WIDX_CONSTRUCTION_RIGHTS_SALE_CHECKBOX].setHidden();
         }
 
         void PrepareDrawSandbox()
@@ -346,15 +346,15 @@ namespace OpenRCT2::Ui::Windows
             widgets[WIDX_INCREMENT].bottom = widgets[WIDX_INCREMENT].top + 16;
 
             // Hide in-game mode widgets
-            widgets[WIDX_BUY_LAND_RIGHTS].type = WidgetType::empty;
-            widgets[WIDX_BUY_CONSTRUCTION_RIGHTS].type = WidgetType::empty;
+            widgets[WIDX_BUY_LAND_RIGHTS].setHidden();
+            widgets[WIDX_BUY_CONSTRUCTION_RIGHTS].setHidden();
 
             // Show editor/sandbox mode widgets
-            widgets[WIDX_UNOWNED_LAND_CHECKBOX].type = WidgetType::checkbox;
-            widgets[WIDX_LAND_OWNED_CHECKBOX].type = WidgetType::checkbox;
-            widgets[WIDX_CONSTRUCTION_RIGHTS_OWNED_CHECKBOX].type = WidgetType::checkbox;
-            widgets[WIDX_LAND_SALE_CHECKBOX].type = WidgetType::checkbox;
-            widgets[WIDX_CONSTRUCTION_RIGHTS_SALE_CHECKBOX].type = WidgetType::checkbox;
+            widgets[WIDX_UNOWNED_LAND_CHECKBOX].setVisible();
+            widgets[WIDX_LAND_OWNED_CHECKBOX].setVisible();
+            widgets[WIDX_CONSTRUCTION_RIGHTS_OWNED_CHECKBOX].setVisible();
+            widgets[WIDX_LAND_SALE_CHECKBOX].setVisible();
+            widgets[WIDX_CONSTRUCTION_RIGHTS_SALE_CHECKBOX].setVisible();
         }
 
         ScreenSize GetModeDimensions() const
@@ -419,7 +419,7 @@ namespace OpenRCT2::Ui::Windows
                 auto ft = Formatter();
                 ft.Add<money64>(_landRightsCost);
 
-                auto offset = widgets[WIDX_BUY_LAND_RIGHTS].type != WidgetType::empty ? 32 : 8;
+                auto offset = widgets[WIDX_BUY_LAND_RIGHTS].isVisible() ? 32 : 8;
 
                 screenCoords = { widgets[WIDX_PREVIEW].midX() + windowPos.x,
                                  widgets[WIDX_PREVIEW].bottom + windowPos.y + offset };
@@ -429,7 +429,7 @@ namespace OpenRCT2::Ui::Windows
 
         GameActions::LandBuyRightsAction GetLandBuyAction()
         {
-            auto mode = (_landRightsMode == LandRightsMode::BuyLand) ? GameActions::LandBuyRightSetting::buyLand
+            auto mode = (_landRightsMode == LandRightsMode::buyLand) ? GameActions::LandBuyRightSetting::buyLand
                                                                      : GameActions::LandBuyRightSetting::buyConstructionRights;
 
             return GameActions::LandBuyRightsAction(
@@ -440,15 +440,15 @@ namespace OpenRCT2::Ui::Windows
         {
             switch (_landRightsMode)
             {
-                case LandRightsMode::SetLandForSale:
+                case LandRightsMode::setLandForSale:
                     return OWNERSHIP_AVAILABLE;
-                case LandRightsMode::SetLandOwned:
+                case LandRightsMode::setLandOwned:
                     return OWNERSHIP_OWNED;
-                case LandRightsMode::SetConstructionRightsForSale:
+                case LandRightsMode::setConstructionRightsForSale:
                     return OWNERSHIP_CONSTRUCTION_RIGHTS_AVAILABLE;
-                case LandRightsMode::SetConstructionRightsOwned:
+                case LandRightsMode::setConstructionRightsOwned:
                     return OWNERSHIP_CONSTRUCTION_RIGHTS_OWNED;
-                case LandRightsMode::SetLandUnowned:
+                case LandRightsMode::setLandUnowned:
                 default:
                     return OWNERSHIP_UNOWNED;
             }

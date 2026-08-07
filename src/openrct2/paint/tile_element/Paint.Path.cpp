@@ -9,18 +9,11 @@
 
 #include "Paint.Path.h"
 
-#include "../../Context.h"
-#include "../../GameState.h"
-#include "../../config/Config.h"
-#include "../../drawing/Drawing.h"
+#include "../../drawing/PaletteIndex.h"
 #include "../../interface/Viewport.h"
-#include "../../localisation/Formatter.h"
-#include "../../localisation/Formatting.h"
 #include "../../localisation/StringIds.h"
-#include "../../object/FootpathObject.h"
-#include "../../object/FootpathRailingsObject.h"
+#include "../../object/FootpathEntry.h"
 #include "../../object/FootpathSurfaceObject.h"
-#include "../../object/PathAdditionEntry.h"
 #include "../../profiling/Profiling.h"
 #include "../../ride/Ride.h"
 #include "../../ride/TrackDesign.h"
@@ -33,6 +26,7 @@
 #include "../../world/tile_element/TrackElement.h"
 #include "../Boundbox.h"
 #include "../Paint.SessionFlags.h"
+#include "../Paint.h"
 #include "../support/MetalSupports.h"
 #include "../support/WoodenSupports.h"
 #include "Paint.PathAddition.h"
@@ -625,17 +619,17 @@ static void PathPaintFencesAdditionsTunnels(
         if (sloped && direction == EDGE_NE)
         {
             // Path going down into the tunnel
-            PaintUtilPushTunnelRight(session, height + 16, TunnelType::PathAndMiniGolf);
+            PaintUtilPushTunnelRight(session, height + 16, TunnelType::pathAndMiniGolf);
         }
         else if (connectedEdges & EDGE_NE)
         {
             // Flat path with edge to the right (north-east)
-            PaintUtilPushTunnelRight(session, height, TunnelType::Path11);
+            PaintUtilPushTunnelRight(session, height, TunnelType::path11);
         }
         else
         {
             // Path going up, or flat and not connected to the right
-            PaintUtilPushTunnelRight(session, height, TunnelType::PathAndMiniGolf);
+            PaintUtilPushTunnelRight(session, height, TunnelType::pathAndMiniGolf);
         }
     }
 
@@ -648,17 +642,17 @@ static void PathPaintFencesAdditionsTunnels(
     if (sloped && direction == EDGE_SE)
     {
         // Path going down into the tunnel
-        PaintUtilPushTunnelLeft(session, height + 16, TunnelType::PathAndMiniGolf);
+        PaintUtilPushTunnelLeft(session, height + 16, TunnelType::pathAndMiniGolf);
     }
     else if (connectedEdges & EDGE_NW)
     {
         // Flat path with edge to the left (north-west)
-        PaintUtilPushTunnelLeft(session, height, TunnelType::Path11);
+        PaintUtilPushTunnelLeft(session, height, TunnelType::path11);
     }
     else
     {
         // Path going up, or flat and not connected to the left
-        PaintUtilPushTunnelLeft(session, height, TunnelType::PathAndMiniGolf);
+        PaintUtilPushTunnelLeft(session, height, TunnelType::pathAndMiniGolf);
     }
 }
 
